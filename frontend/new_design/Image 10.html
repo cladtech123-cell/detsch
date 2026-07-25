@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeutschMastery - Interaktive Übung</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#004ac6",
+                    "secondary-fixed-dim": "#eec200",
+                    "on-secondary-fixed-variant": "#574500",
+                    "on-surface-variant": "#434655",
+                    "outline-variant": "#c3c6d7",
+                    "on-surface": "#191b23",
+                    "on-secondary-fixed": "#231b00",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e7e7f3",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f0fb",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#4ae176",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "on-tertiary-fixed-variant": "#005321",
+                    "secondary-fixed": "#ffe083",
+                    "on-tertiary-fixed": "#002109",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "inverse-surface": "#2e3039",
+                    "tertiary-fixed": "#6bff8f",
+                    "on-primary-container": "#eeefff",
+                    "surface-container-highest": "#e1e2ed",
+                    "tertiary-container": "#007e37",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#0053db",
+                    "surface-dim": "#d9d9e5",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#2563eb",
+                    "secondary-container": "#fed01b",
+                    "surface-variant": "#e1e2ed",
+                    "primary-fixed": "#dbe1ff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f3f3fe",
+                    "outline": "#737686",
+                    "on-background": "#191b23",
+                    "on-tertiary-container": "#c1ffc5",
+                    "background": "#faf8ff",
+                    "on-primary-fixed": "#00174b",
+                    "surface-bright": "#faf8ff",
+                    "surface": "#faf8ff",
+                    "tertiary": "#006229",
+                    "on-secondary-container": "#6f5900",
+                    "secondary": "#735c00",
+                    "on-error": "#ffffff",
+                    "surface-container": "#ededf9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "stack-sm": "8px",
+                    "gutter": "24px",
+                    "margin-desktop": "32px",
+                    "unit": "4px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "container-max": "1200px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        
+        .word-pill {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+            user-select: none;
+        }
+        
+        .word-pill:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .drop-zone {
+            min-height: 64px;
+            background-image: radial-gradient(circle, #c3c6d7 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        @keyframes success-pop {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .animate-success {
+            animation: success-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-stack-lg bg-surface-container-low border-r border-outline-variant w-64 z-50">
+<div class="px-6 mb-stack-lg">
+<span class="font-headline-md text-headline-md font-black text-primary">DeutschMastery</span>
+</div>
+<div class="px-4 mb-stack-lg">
+<div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-high">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a person with a warm, encouraging smile, set against a soft-focus background of a modern workspace with natural lighting. The style is clean, high-resolution, and fits a premium edtech brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6Xdf4Gb-B6e348fr6NEj1FFtsk4O1sr2LFXqDFWtdaZ9VjNktKlmPU2HWV-LgfgHPRgJtZ0zC-xm_2a9CMMl017LDFbd5htp5ps1AuHjEFXCqm1B8Z3hljI9AGv-m_6Xff9fw079lJ5wTl52Cy0XdEbRZVJN07pQcHb0PNhLP3kzl5X5wfooqdTqVqnzrNquvpcbVTFefH5j91U98mE1qxyXvGGp1ozX2VJ0eb3AjB8aqCQbQBLE0nCbUz_7L0DYTTQf_xzT00GCz"/>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">Willkommen, Max</p>
+<p class="text-[11px] text-on-surface-variant uppercase tracking-wider">Level B1 • 12 Tage Streak</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="dashboard">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary font-bold border-r-4 border-primary bg-primary-fixed/10 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-md">Lektionen</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="style">style</span>
+<span class="font-label-md">Flashcards</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="leaderboard">leaderboard</span>
+<span class="font-label-md">Statistiken</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="settings">settings</span>
+<span class="font-label-md">Einstellungen</span>
+</a>
+</nav>
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-95 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span>Premium Upgrade</span>
+</button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg text-on-surface-variant hover:underline text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="help">help</span>
+<span>Hilfe</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg text-on-surface-variant hover:underline text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="logout">logout</span>
+<span>Abmelden</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col relative overflow-hidden">
+<!-- Progress Bar Top -->
+<header class="sticky top-0 z-40 bg-background/80 backdrop-blur-md px-margin-desktop py-6 flex items-center gap-6 max-w-container-max mx-auto w-full">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<div class="flex-1 h-3 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-fixed-dim rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(74,225,118,0.4)]" style="width: 65%;"></div>
+</div>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-[20px]" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span>5</span>
+</div>
+</header>
+<!-- Exercise Container -->
+<section class="flex-1 flex flex-col items-center justify-center px-margin-desktop py-stack-lg max-w-[800px] mx-auto w-full">
+<!-- Question Prompt -->
+<div class="w-full mb-12 text-center">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-stack-sm">Bilde den Satz</h1>
+<p class="text-on-surface-variant font-body-lg">Übersetze: "I am going to the cinema"</p>
+</div>
+<!-- Bento Card Grid Layout for Content -->
+<div class="w-full grid grid-cols-12 gap-6 items-start">
+<!-- Character/Guide (Bento Item) -->
+<div class="col-span-4 hidden lg:flex flex-col items-center">
+<div class="relative w-48 h-48 bg-primary/5 rounded-full flex items-center justify-center">
+<img class="w-40 h-40 object-contain" data-alt="A friendly and professional 3D character of a young German language teacher with glasses, wearing a minimalist navy sweater. The character has an encouraging expression and is rendered in a soft, high-quality Pixar-like style with ambient lighting on a clean studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDstqakUW2nyWrRfsBwFbJWQwnX1JLVhd87LIMMtXBbLPGcdq0bEFXryHUN6IkApp3RoUkqjSNpdlp_k4uscIlZVr84tCbNpFNlG2OdytQndZyFVbMrEVEcGcm9Cgybnk1vCQsx6uSIbwp75n4mAzA1-7107Gf6TFhlGehq41BvyuODYTLrqvrlUp5sH12IhtN4XBkzQF3ONG79UWPOpzLelBaECZuHMY54Mt-to5Dj5N9syOMWYyEn1NAcqxPdkZw6rZEu7xgM62vH"/>
+<div class="absolute -top-4 -right-4 glass-card px-4 py-2 rounded-2xl shadow-sm border border-outline-variant">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="volume_up" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+</div>
+</div>
+</div>
+<!-- Exercise Area (Bento Item) -->
+<div class="col-span-12 lg:col-span-8 space-y-12">
+<!-- Drop Destination Area -->
+<div class="drop-zone w-full flex flex-wrap gap-3 p-6 rounded-3xl border-2 border-dashed border-outline-variant items-center min-h-[120px] transition-all bg-white shadow-sm" id="drop-zone">
+<!-- Placed words will appear here -->
+</div>
+<!-- Available Word Pills -->
+<div class="flex flex-wrap justify-center gap-4" id="source-zone">
+<div class="word-pill px-6 py-3 bg-white border border-outline-variant rounded-2xl shadow-[0_4px_0_0_#c3c6d7] font-bold text-body-lg hover:-translate-y-1 active:translate-y-1 active:shadow-none transition-all" data-word="gehe">gehe</div>
+<div class="word-pill px-6 py-3 bg-white border border-outline-variant rounded-2xl shadow-[0_4px_0_0_#c3c6d7] font-bold text-body-lg hover:-translate-y-1 active:translate-y-1 active:shadow-none transition-all" data-word="Kino">Kino</div>
+<div class="word-pill px-6 py-3 bg-white border border-outline-variant rounded-2xl shadow-[0_4px_0_0_#c3c6d7] font-bold text-body-lg hover:-translate-y-1 active:translate-y-1 active:shadow-none transition-all" data-word="Ich">Ich</div>
+<div class="word-pill px-6 py-3 bg-white border border-outline-variant rounded-2xl shadow-[0_4px_0_0_#c3c6d7] font-bold text-body-lg hover:-translate-y-1 active:translate-y-1 active:shadow-none transition-all" data-word="ins">ins</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Footer -->
+<footer class="mt-auto border-t border-outline-variant py-8 px-margin-desktop bg-white">
+<div class="max-w-container-max mx-auto flex justify-between items-center">
+<button class="px-8 py-3 font-bold text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors uppercase tracking-widest text-sm">
+                    Überspringen
+                </button>
+<button class="px-12 py-3 bg-primary text-white font-bold rounded-xl shadow-[0_4px_0_0_#003ea8] hover:brightness-110 active:translate-y-1 active:shadow-none transition-all uppercase tracking-widest" id="check-button">
+                    Prüfen
+                </button>
+</div>
+</footer>
+<!-- Success Toast (Hidden initially) -->
+<div class="fixed bottom-0 left-64 right-0 h-32 bg-on-tertiary-container text-tertiary transform translate-y-full transition-transform duration-500 z-50 flex items-center px-margin-desktop" id="success-toast">
+<div class="max-w-container-max mx-auto w-full flex justify-between items-center">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center animate-success">
+<span class="material-symbols-outlined text-[40px] text-tertiary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-tertiary-fixed-variant">Hervorragend!</h3>
+<p class="text-on-tertiary-fixed-variant font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="electric_bolt" style="font-variation-settings: 'FILL' 1;">electric_bolt</span>
+                            +10 XP erhalten
+                        </p>
+</div>
+</div>
+<button class="px-10 py-4 bg-tertiary text-on-tertiary font-bold rounded-2xl shadow-[0_4px_0_0_#005321] hover:brightness-110 active:translate-y-1 active:shadow-none transition-all" onclick="location.reload()">
+                    WEITER
+                </button>
+</div>
+</div>
+</main>
+<script>
+        // Simple Interaction Logic
+        const sourceZone = document.getElementById('source-zone');
+        const dropZone = document.getElementById('drop-zone');
+        const checkButton = document.getElementById('check-button');
+        const successToast = document.getElementById('success-toast');
+
+        // Event Delegation for Word Pills
+        document.addEventListener('click', (e) => {
+            const pill = e.target.closest('.word-pill');
+            if (!pill) return;
+
+            if (pill.parentElement === sourceZone) {
+                // Move to drop zone
+                dropZone.appendChild(pill);
+                pill.classList.remove('shadow-[0_4px_0_0_#c3c6d7]');
+                pill.classList.add('shadow-none', 'bg-primary-fixed/30', 'border-primary');
+            } else {
+                // Move back to source
+                sourceZone.appendChild(pill);
+                pill.classList.add('shadow-[0_4px_0_0_#c3c6d7]');
+                pill.classList.remove('shadow-none', 'bg-primary-fixed/30', 'border-primary');
+            }
+        });
+
+        checkButton.addEventListener('click', () => {
+            const currentSentence = Array.from(dropZone.children).map(c => c.dataset.word).join(' ');
+            const correctSentence = "Ich gehe ins Kino";
+
+            if (currentSentence === correctSentence) {
+                // Success State
+                successToast.style.transform = 'translateY(0)';
+                document.querySelectorAll('.word-pill').forEach(p => {
+                    p.style.pointerEvents = 'none';
+                    if (p.parentElement === dropZone) {
+                        p.classList.remove('border-primary', 'bg-primary-fixed/30');
+                        p.classList.add('bg-tertiary-fixed-dim', 'border-tertiary', 'text-on-tertiary-fixed');
+                    }
+                });
+                
+                // Play subtle success sound effect (simulated)
+                console.log("Success! +10XP");
+            } else {
+                // Shake animation for error
+                dropZone.classList.add('border-error', 'animate-pulse');
+                setTimeout(() => {
+                    dropZone.classList.remove('border-error', 'animate-pulse');
+                }, 1000);
+            }
+        });
+
+        // Hover scale effect for Sidebar items
+        const navLinks = document.querySelectorAll('aside nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('mousedown', () => {
+                link.classList.add('scale-[0.98]');
+            });
+            link.addEventListener('mouseup', () => {
+                link.classList.remove('scale-[0.98]');
+            });
+        });
+    </script>
+</body></html>

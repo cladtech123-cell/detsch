@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ─── Light Theme (default) ─────────────────────────────────── */
+  :root,
+  .light {
+    --color-bg: #fafafc;
+    --color-surface: #ffffff;
+    --color-panel: #f8fafc;
+    --color-border: #e2e8f0;
+    --color-muted: #64748b;
+    --color-text: #0f172a;
+
+    --color-accent: #6366f1;
+    --color-accent-dark: #4f46e5;
+    --color-accent-glow: rgba(99, 102, 241, 0.08);
+
+    --shadow-panel: 0 10px 15px -3px rgba(0, 0, 0, 0.02),
+      0 4px 6px -4px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    --shadow-glow: 0 0 0 1px rgba(99, 102, 241, 0.1),
+      0 4px 12px -2px rgba(99, 102, 241, 0.05);
+
+    --bg-grid-color: rgba(99, 102, 241, 0.02);
+
+    /* Material design tokens – light */
+    --dm-primary: #004ac6;
+    --dm-on-primary: #ffffff;
+    --dm-primary-container: #2563eb;
+    --dm-on-primary-container: #eeefff;
+    --dm-surface: #faf8ff;
+    --dm-on-surface: #191b23;
+    --dm-on-surface-variant: #434655;
+    --dm-surface-container-low: #f3f3fe;
+    --dm-surface-container: #ededf9;
+    --dm-surface-container-high: #e7e7f3;
+    --dm-outline-variant: #c3c6d7;
+    --dm-background: #faf8ff;
+    --dm-error: #ba1a1a;
+    --dm-input-bg: #ffffff;
+    --dm-input-border: #c3c6d7;
+    --dm-input-text: #191b23;
+    --dm-card-bg: rgba(255, 255, 255, 0.85);
+    --dm-sidebar-bg: #f3f3fe;
+    --dm-header-bg: transparent;
+  }
+
+  /* ─── Dark Theme ─────────────────────────────────────────────── */
+  .dark {
+    --color-bg: #0b0f19;
+    --color-surface: #111827;
+    --color-panel: #1f2937;
+    --color-border: #2d3748;
+    --color-muted: #9ca3af;
+    --color-text: #f3f4f6;
+
+    --color-accent: #a5b4fc;
+    --color-accent-dark: #818cf8;
+    --color-accent-glow: rgba(165, 180, 252, 0.08);
+
+    --shadow-panel: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
+      0 4px 6px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
+    --shadow-glow: 0 0 0 1px rgba(165, 180, 252, 0.15),
+      0 4px 12px -2px rgba(165, 180, 252, 0.1);
+
+    --bg-grid-color: rgba(165, 180, 252, 0.015);
+
+    /* Material design tokens – dark */
+    --dm-primary: #b4c5ff;
+    --dm-on-primary: #002984;
+    --dm-primary-container: #003ea8;
+    --dm-on-primary-container: #dbe1ff;
+    --dm-surface: #111827;
+    --dm-on-surface: #e3e2ef;
+    --dm-on-surface-variant: #c3c5d5;
+    --dm-surface-container-low: #191b23;
+    --dm-surface-container: #1e2030;
+    --dm-surface-container-high: #272940;
+    --dm-outline-variant: #42455a;
+    --dm-background: #0b0f19;
+    --dm-error: #ffb4ab;
+    --dm-input-bg: #1e2030;
+    --dm-input-border: #42455a;
+    --dm-input-text: #e3e2ef;
+    --dm-card-bg: rgba(30, 32, 48, 0.9);
+    --dm-sidebar-bg: #13151f;
+    --dm-header-bg: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    @apply min-h-screen bg-cyber-bg text-cyber-text font-sans antialiased transition-colors duration-300;
+  }
+
+  body {
+    margin: 0;
+    background-image: theme('backgroundImage.grid-glow');
+    background-size: theme('backgroundSize.grid');
+    background-position: center top;
+    background-color: var(--dm-background);
+    color: var(--dm-on-surface);
+  }
+
+  ::selection {
+    background-color: var(--color-accent-glow);
+    color: var(--color-text);
+  }
+
+  /* Slim scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--color-border);
+  }
+}
+
+@layer components {
+  /* Raised card */
+  .panel {
+    @apply rounded-2xl border border-cyber-border bg-cyber-surface shadow-panel transition-all duration-300;
+  }
+
+  .heading-accent {
+    @apply font-mono text-[10px] uppercase tracking-[0.2em] text-accent;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .active-ring {
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #004ac6;
+  }
+
+  .progress-circle {
+    transition: stroke-dashoffset 0.8s ease-in-out;
+  }
+
+  /* Glass card – adapts per theme */
+  .glass-card {
+    background: var(--dm-card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--dm-outline-variant);
+  }
+
+  .learning-card-shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  /* 3-D Flashcard flip */
+  .flashcard-inner {
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+
+  .flashcard-flipped .flashcard-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flashcard-front,
+  .flashcard-back {
+    backface-visibility: hidden;
+  }
+
+  .flashcard-back {
+    transform: rotateY(180deg);
+  }
+
+  /* ─── Theme-aware utility classes ─────────────────────────── */
+  .dm-surface {
+    background-color: var(--dm-surface);
+    color: var(--dm-on-surface);
+  }
+
+  .dm-surface-low {
+    background-color: var(--dm-surface-container-low);
+  }
+
+  .dm-surface-container {
+    background-color: var(--dm-surface-container);
+  }
+
+  .dm-surface-high {
+    background-color: var(--dm-surface-container-high);
+  }
+
+  .dm-sidebar {
+    background-color: var(--dm-sidebar-bg);
+    border-color: var(--dm-outline-variant);
+  }
+
+  .dm-input {
+    background-color: var(--dm-input-bg);
+    border-color: var(--dm-input-border);
+    color: var(--dm-input-text);
+  }
+
+  .dm-text {
+    color: var(--dm-on-surface);
+  }
+
+  .dm-text-muted {
+    color: var(--dm-on-surface-variant);
+  }
+
+  .dm-primary {
+    color: var(--dm-primary);
+  }
+
+  .dm-border {
+    border-color: var(--dm-outline-variant);
+  }
+}

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeutschMastery - Modalverben Lektion</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#004ac6",
+                    "secondary-fixed-dim": "#eec200",
+                    "on-secondary-fixed-variant": "#574500",
+                    "on-surface-variant": "#434655",
+                    "outline-variant": "#c3c6d7",
+                    "on-surface": "#191b23",
+                    "on-secondary-fixed": "#231b00",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e7e7f3",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f0fb",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#4ae176",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "on-tertiary-fixed-variant": "#005321",
+                    "secondary-fixed": "#ffe083",
+                    "on-tertiary-fixed": "#002109",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "inverse-surface": "#2e3039",
+                    "tertiary-fixed": "#6bff8f",
+                    "on-primary-container": "#eeefff",
+                    "surface-container-highest": "#e1e2ed",
+                    "tertiary-container": "#007e37",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#0053db",
+                    "surface-dim": "#d9d9e5",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#2563eb",
+                    "secondary-container": "#fed01b",
+                    "surface-variant": "#e1e2ed",
+                    "primary-fixed": "#dbe1ff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f3f3fe",
+                    "outline": "#737686",
+                    "on-background": "#191b23",
+                    "on-tertiary-container": "#c1ffc5",
+                    "background": "#faf8ff",
+                    "on-primary-fixed": "#00174b",
+                    "surface-bright": "#faf8ff",
+                    "surface": "#faf8ff",
+                    "tertiary": "#006229",
+                    "on-secondary-container": "#6f5900",
+                    "secondary": "#735c00",
+                    "on-error": "#ffffff",
+                    "surface-container": "#ededf9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "stack-sm": "8px",
+                    "gutter": "24px",
+                    "margin-desktop": "32px",
+                    "unit": "4px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "container-max": "1200px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+        .learning-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .learning-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        }
+        .nav-glass {
+            background: rgba(250, 248, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- Header Section -->
+<header class="fixed top-0 left-0 right-0 z-50 nav-glass bg-background shadow-sm">
+<div class="max-w-container-max mx-auto px-margin-desktop py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</button>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Modalverben: Können &amp; Müssen</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Modul 4 • Lektion 2</p>
+</div>
+</div>
+<div class="flex items-center gap-6 w-full md:w-1/3">
+<div class="flex-1">
+<div class="flex justify-between mb-1">
+<span class="font-label-sm text-label-sm font-bold text-primary">65% abgeschlossen</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container transition-all duration-1000 ease-out" style="width: 65%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-md text-label-md font-bold">12</span>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 max-w-container-max mx-auto px-margin-desktop flex flex-col lg:flex-row gap-gutter">
+<!-- Main Content Area -->
+<div class="flex-1 space-y-stack-lg">
+<!-- 1. Vocabulary List Section -->
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant card-shadow">
+<div class="flex items-center gap-3 mb-stack-md">
+<span class="material-symbols-outlined text-primary">dictionary</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Wortschatz</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-primary uppercase font-black mb-1">Verb</span>
+<span class="font-body-lg text-body-lg font-bold">können</span>
+<span class="text-on-surface-variant italic">to be able to / can</span>
+</div>
+<button class="text-primary hover:scale-110 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-primary uppercase font-black mb-1">Verb</span>
+<span class="font-body-lg text-body-lg font-bold">müssen</span>
+<span class="text-on-surface-variant italic">to have to / must</span>
+</div>
+<button class="text-primary hover:scale-110 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-primary uppercase font-black mb-1">Nomen</span>
+<span class="font-body-lg text-body-lg font-bold">die Fähigkeit</span>
+<span class="text-on-surface-variant italic">the ability</span>
+</div>
+<button class="text-primary hover:scale-110 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-primary uppercase font-black mb-1">Nomen</span>
+<span class="font-body-lg text-body-lg font-bold">die Pflicht</span>
+<span class="text-on-surface-variant italic">the duty / obligation</span>
+</div>
+<button class="text-primary hover:scale-110 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 2. Grammar Explanation Section -->
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant card-shadow">
+<div class="flex items-center gap-3 mb-stack-md">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Grammatik: Konjugation</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                    In German, modal verbs change their vowel in the singular forms (ich, du, er/sie/es). Notice how the first and third person singular have no ending.
+                </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Table Können -->
+<div>
+<h3 class="font-label-md text-label-md font-bold mb-3 text-primary uppercase tracking-wider">Können (Fähigkeit)</h3>
+<table class="w-full border-collapse rounded-lg overflow-hidden border border-outline-variant">
+<thead class="bg-surface-container">
+<tr>
+<th class="p-3 text-left font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Person</th>
+<th class="p-3 text-left font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Form</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b border-outline-variant">
+<td class="p-3 text-on-surface-variant">ich</td>
+<td class="p-3 font-bold text-primary">kann</td>
+</tr>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<td class="p-3 text-on-surface-variant">du</td>
+<td class="p-3 font-bold text-primary">kannst</td>
+</tr>
+<tr class="bg-white border-b border-outline-variant">
+<td class="p-3 text-on-surface-variant">er/sie/es</td>
+<td class="p-3 font-bold text-primary">kann</td>
+</tr>
+<tr class="bg-surface-container-low">
+<td class="p-3 text-on-surface-variant">wir</td>
+<td class="p-3 font-bold text-on-surface">können</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Müssen -->
+<div>
+<h3 class="font-label-md text-label-md font-bold mb-3 text-secondary-container bg-on-secondary-container inline-block px-2 py-0.5 rounded text-white uppercase tracking-wider">Müssen (Notwendigkeit)</h3>
+<table class="w-full border-collapse rounded-lg overflow-hidden border border-outline-variant">
+<thead class="bg-surface-container">
+<tr>
+<th class="p-3 text-left font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Person</th>
+<th class="p-3 text-left font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Form</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b border-outline-variant">
+<td class="p-3 text-on-surface-variant">ich</td>
+<td class="p-3 font-bold text-primary">muss</td>
+</tr>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<td class="p-3 text-on-surface-variant">du</td>
+<td class="p-3 font-bold text-primary">musst</td>
+</tr>
+<tr class="bg-white border-b border-outline-variant">
+<td class="p-3 text-on-surface-variant">er/sie/es</td>
+<td class="p-3 font-bold text-primary">muss</td>
+</tr>
+<tr class="bg-surface-container-low">
+<td class="p-3 text-on-surface-variant">wir</td>
+<td class="p-3 font-bold text-on-surface">müssen</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- 3. Example Sentences Section -->
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant card-shadow">
+<div class="flex items-center gap-3 mb-stack-md">
+<span class="material-symbols-outlined text-primary">record_voice_over</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Beispielsätze</h2>
+</div>
+<div class="space-y-4">
+<div class="group flex items-start justify-between p-4 rounded-xl border border-outline-variant hover:border-primary transition-all">
+<div class="flex-1">
+<p class="font-body-lg text-body-lg font-semibold text-on-surface mb-1">Ich <span class="text-primary underline decoration-2 underline-offset-4">kann</span> sehr gut Deutsch sprechen.</p>
+<p class="text-on-surface-variant text-body-md">I can speak German very well.</p>
+</div>
+<button class="ml-4 p-3 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+</div>
+<div class="group flex items-start justify-between p-4 rounded-xl border border-outline-variant hover:border-primary transition-all">
+<div class="flex-1">
+<p class="font-body-lg text-body-lg font-semibold text-on-surface mb-1">Wir <span class="text-primary underline decoration-2 underline-offset-4">müssen</span> heute viel arbeiten.</p>
+<p class="text-on-surface-variant text-body-md">We have to work a lot today.</p>
+</div>
+<button class="ml-4 p-3 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 4. Interactive Exercise Section -->
+<section class="bg-primary/5 p-8 rounded-xl border-2 border-dashed border-primary/30 card-shadow">
+<div class="flex items-center gap-3 mb-stack-md">
+<span class="material-symbols-outlined text-primary">quiz</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Übung: Fülle die Lücken aus</h2>
+</div>
+<div class="space-y-6">
+<div class="bg-white p-6 rounded-lg border border-outline-variant">
+<p class="text-body-lg mb-4 leading-loose">
+                            1. Thomas <input class="mx-2 w-32 border-b-2 border-t-0 border-x-0 border-outline text-center focus:ring-0 focus:border-primary font-bold text-primary uppercase" placeholder="..." type="text"/> heute spät arbeiten. (müssen)
+                        </p>
+<p class="text-body-lg mb-4 leading-loose">
+                            2. <input class="mx-2 w-32 border-b-2 border-t-0 border-x-0 border-outline text-center focus:ring-0 focus:border-primary font-bold text-primary uppercase" placeholder="..." type="text"/> du Klavier spielen? (können)
+                        </p>
+<button class="mt-4 px-8 py-3 bg-primary text-white rounded-full font-bold hover:bg-primary/90 active:scale-95 transition-all shadow-md">
+                            Antwort prüfen
+                        </button>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar / Notes Area -->
+<aside class="w-full lg:w-80 space-y-stack-lg">
+<!-- Sticky Notes Section -->
+<div class="sticky top-32">
+<div class="bg-secondary-fixed text-on-secondary-fixed p-6 rounded-xl border border-secondary-container shadow-lg transform rotate-1">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-[20px]">sticky_note_2</span>
+<h3 class="font-label-md text-label-md font-black uppercase">Meine Notizen</h3>
+</div>
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-body-md h-48 resize-none placeholder:text-on-secondary-fixed/50" placeholder="Schreibe deine eigenen Notizen hier..."></textarea>
+<div class="flex justify-end mt-2">
+<span class="text-[10px] font-bold opacity-60">Zuletzt gespeichert: Vor 2 Min.</span>
+</div>
+</div>
+<!-- Pro Tip Card -->
+<div class="mt-stack-lg bg-surface-container-high p-6 rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-2">Pro-Tipp 💡</h4>
+<p class="text-label-md text-on-surface-variant leading-relaxed">
+                        Das Modalverb steht immer auf Position 2, das Vollverb im Infinitiv wandert ganz ans <strong>Satzende</strong>!
+                    </p>
+</div>
+<!-- Illustration Box -->
+<div class="mt-stack-lg rounded-xl overflow-hidden h-48 relative border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist 3D illustration of a bookshelf with a glowing German dictionary. The style is modern tech-art with soft rounded corners and a vibrant blue and white color palette, consistent with a high-end educational SaaS platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZuQ8Zr4wmg1eVVgNwoXEDr0X9B6h77DMFnmZEjqCU1fIrXkjboh6A11iynMwF2dF80MI4BOXmwYek456L2qGHYgWcjfYBqs4LqiXyIFDE5mW9cNvmSYC5Ri6eZIC9fSllSlIS8SUDcgteklqzrlphxmdHi8_IBCojcS5YrgljPcBABufaF8IHK4DUGS9HmeA-b7qJYIIlfJLKIP9INBVVxa1YqgK2yyqHAvMTtm_uPVZQAVaDnxw5P_Ke8P67H3G3m9Lhh2waX0vW"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+<p class="text-white text-label-sm font-bold">Modul-Ressourcen: PDF Download</p>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Bottom Navigation Buttons -->
+<footer class="fixed bottom-0 left-0 right-0 nav-glass border-t border-outline-variant z-50">
+<div class="max-w-container-max mx-auto px-margin-desktop py-4 flex justify-between items-center">
+<button class="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-95">
+<span class="material-symbols-outlined">chevron_left</span>
+                Vorherige Lektion
+            </button>
+<div class="hidden md:flex gap-4">
+<button class="p-3 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<button class="flex items-center gap-2 px-8 py-3 rounded-full font-bold bg-primary text-white hover:bg-primary/90 transition-all active:scale-95 shadow-md">
+                Nächste Lektion
+                <span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for word audio
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const icon = this.querySelector('.material-symbols-outlined');
+                if (icon && icon.textContent === 'volume_up') {
+                    this.classList.add('text-secondary-fixed-dim');
+                    setTimeout(() => {
+                        this.classList.remove('text-secondary-fixed-dim');
+                    }, 500);
+                }
+            });
+        });
+
+        // Answer Checking Logic
+        const checkBtn = document.querySelector('button[class*="bg-primary"][class*="text-white"]');
+        if (checkBtn) {
+            checkBtn.addEventListener('click', () => {
+                const inputs = document.querySelectorAll('input[type="text"]');
+                const answers = ['muss', 'kannst'];
+                
+                inputs.forEach((input, index) => {
+                    if (input.value.toLowerCase().trim() === answers[index]) {
+                        input.classList.remove('border-outline', 'border-error');
+                        input.classList.add('border-tertiary-container', 'text-tertiary-container');
+                    } else {
+                        input.classList.remove('border-outline', 'border-tertiary-container');
+                        input.classList.add('border-error', 'text-error');
+                    }
+                });
+            });
+        }
+    </script>
+</body></html>
