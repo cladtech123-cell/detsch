@@ -1,117 +1,284 @@
-# 🎓 Deutsch-Lernassistent (AI-Powered German Language Tutor)
+# 🎓 Deutsch-Lernassistent
 
-A personalized, private web application designed to act as your study mentor, reviewed exercises logger, vocabulary manager, and homework OCR assistant. Synthesized specifically for the *Momente A1.1* curriculum.
+An AI-powered German language learning platform based on the **Momente A1.1** curriculum.
 
----
-
-## ✨ Core Features
-
-1. 📊 **Lern-Dashboard** — Quick view of CEFR levels, vocabulary lists, active lesson status, streaking history, and recent grammar mistakes.
-2. 💬 **AI Tutor Chat** — Strict German language mentor with automatic mistake checks. Provides friendly grammar corrections and explains rules in **Uzbek** (primary) and **English** (fallback).
-3. 📚 **Spaced Repetition Vocab (Wortschatz)** — Uses the **Leitner box system** (Box 1 to 5) to review words on optimal days. Features TTS voice readings and AI-generated context sentences.
-4. 🏫 **Grammar Library** — Interactive cards explaining rules in Uzbek and English, paired with mini check-up quizzes.
-5. 📂 **Classroom Sync (OCR)** — Upload whiteboard snapshots, notebooks, or class PDFs. The system parses them to automatically extract new vocabulary words and register new grammar concepts.
-6. 📝 **Homework Grader** — Submits essays or worksheets (via text or image OCR) to receive grade sheets, scores, and correction cards.
-7. 🎤 **Voice Practicing** — Connects to the browser's native **Web Speech API** for hands-free Text-to-Speech (TTS) reading and Speech-to-Text (STT) German transcription.
-8. 📈 **Weekly Reports** — Compiles haftalik progress analysis, highlighting strengths, recurring weaknesses, and personal study suggestions.
+The project provides a modern web application for vocabulary learning, grammar practice, AI tutoring, OCR-assisted homework processing, progress tracking, and classroom management.
 
 ---
 
-## 🏗️ Tech Stack
+# 🤖 AI Agent Instructions
 
-| Layer      | Technology                                                     |
-| ---------- | -------------------------------------------------------------- |
-| **Frontend**| React 19, TypeScript, TailwindCSS, TanStack Query, Zustand, React Router, Axios |
-| **Backend** | FastAPI, SQLAlchemy 2.x (async), Alembic, SQLite (`aiosqlite`) |
-| **AI / OCR**| Gemini API (REST Client), OpenAI API (REST Client) |
-| **Audio**   | HTML5 Web Speech API (TTS & STT) |
+Before making **any** code changes:
+
+1. Read `DEVELOPMENT_RULES.md`
+2. Read `PROJECT_CONTEXT.md`
+3. Read `DEPLOY_CHECKLIST.md`
+
+Requirements:
+
+- Follow the existing architecture.
+- Make the smallest correct change.
+- Do not rewrite working code.
+- Do not refactor unrelated modules.
+- Do not scan the entire repository unless necessary.
+- Verify all affected functionality before reporting success.
+- Prefer targeted fixes over large rewrites.
+- Stop after completing the requested task.
 
 ---
 
-## 📁 Modular Project Structure
+# 📚 Documentation
+
+| File | Description |
+|------|-------------|
+| DEVELOPMENT_RULES.md | Development workflow, coding standards, AI guidelines and token optimization |
+| PROJECT_CONTEXT.md | Project architecture, folder structure, database and API overview |
+| DEPLOY_CHECKLIST.md | Deployment, migrations, production verification checklist |
+
+---
+
+# ✨ Features
+
+- 📊 Learning Dashboard
+- 🤖 AI Tutor
+- 📚 Spaced Repetition Vocabulary (Leitner System)
+- 🏫 Grammar Library
+- 📂 OCR Classroom Sync
+- 📝 Homework Grader
+- 🎤 Speech Practice (TTS / STT)
+- 📈 Weekly Progress Reports
+- 📖 Momente A1.1 Curriculum
+- 👨‍💼 Admin Panel
+- 🔐 Production-ready JWT Authentication (Register, Login, Google OAuth, User/Admin Roles)
+
+---
+
+# 🏗 Technology Stack
+
+## Frontend
+
+- React 19
+- TypeScript
+- Vite
+- TailwindCSS
+- React Router
+- TanStack Query
+- Zustand
+- Axios
+
+## Backend
+
+- FastAPI
+- SQLAlchemy 2.x (Async)
+- Alembic
+- SQLite (aiosqlite)
+- Pydantic
+
+## AI
+
+- Gemini API
+- OpenAI API
+
+## OCR
+
+- OCR Pipeline
+- Image Processing
+
+## Deployment
+
+- Ubuntu VPS
+- Nginx
+- Uvicorn
+
+---
+
+# 📁 Project Structure
 
 ```
 project/
-├── backend/                # FastAPI Application
-│   ├── alembic/            # Alembic DB Migrations
+│
+├── backend/
+│   ├── alembic/
 │   ├── app/
-│   │   ├── api/            # API Router Aggregators (v1)
-│   │   ├── core/           # DB session, settings, dependencies injection
-│   │   ├── models/         # SQLAlchemy ORM schemas
-│   │   ├── schemas/        # Pydantic schemas (request/response validation)
-│   │   ├── repositories/   # GermanRepository (CRUD queries database)
-│   │   └── services/       # GermanService (Core business orchestrations) & AI/OCR adapters
-│   ├── data/               # SQLite database file (german.db)
-│   └── tests/              # pytest unit & integration tests
-├── frontend/               # React + TS + Tailwind Application
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── models/
+│   │   ├── repositories/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── utils/
+│   │
+│   ├── data/
+│   │   └── german.db
+│   │
+│   └── tests/
+│
+├── frontend/
 │   ├── src/
-│   │   ├── components/     # AppLayout, Sidebar, Header, custom cards
-│   │   ├── features/       # Modular features pages (Dashboard, Tutor, Vocab, Grammar, Sync, Mistakes, Exams, Reports)
-│   │   ├── lib/            # Axios API config, services mappings
-│   │   └── routes/         # Central route aggregators
-│   └── ...
-└── README.md
+│   ├── public/
+│   └── dist/
+│
+├── DEVELOPMENT_RULES.md
+├── PROJECT_CONTEXT.md
+├── DEPLOY_CHECKLIST.md
+├── README.md
+└── ...
 ```
 
 ---
 
-## 🚀 Quick Start
+# 🚀 Quick Start
 
-### Prerequisites
-- **Node.js** ≥ 20 (LTS recommended)
-- **Python** ≥ 3.11
-- **pip**
+## Requirements
 
-### 1. Configuration Setup
-Create a `.env` file under the `backend/` folder:
+- Python 3.11+
+- Node.js 20+
+- npm
+- Git
+
+---
+
+## Backend
+
+```bash
+cd backend
+
+python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+
+# Linux
+source .venv/bin/activate
+
+pip install -r requirements.txt
+
+alembic upgrade head
+
+uvicorn app.main:app --reload
+```
+
+Backend:
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## Frontend
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+Frontend:
+
+```
+http://localhost:5173
+```
+
+---
+
+# ⚙ Environment
+
+Example:
+
 ```env
 APP_NAME="Deutsch-Lernassistent"
+
 APP_ENV="development"
+
 DEBUG=true
+
 DATABASE_URL="sqlite+aiosqlite:///./data/german.db"
 
-# AI Configuration (gemini or openai)
 AI_PROVIDER="gemini"
-GEMINI_API_KEY="your_api_key_here"
+
+GEMINI_API_KEY=""
+
 OPENAI_API_KEY=""
 
 EXPLANATION_LANGUAGE="uz"
 ```
 
-### 2. Backend Startup
+---
+
+# 🧪 Testing
+
+Backend
+
 ```bash
 cd backend
-python -m venv .venv
-# Activate virtual environment:
-# Windows (PowerShell): .venv\Scripts\Activate.ps1
-# Windows (cmd): .venv\Scripts\activate.bat
-# Linux/macOS: source .venv/bin/activate
 
-pip install -r requirements.txt
-
-# Run migrations to update SQLite database:
-alembic upgrade head
-
-# Start server:
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+pytest
 ```
-Interactive docs will load at **http://127.0.0.1:8000/docs**.
 
-### 3. Frontend Startup
+Frontend
+
 ```bash
-cd frontend
-npm install
-npm run dev
+npm run build
 ```
-Open **http://localhost:5173** to run the app.
 
 ---
 
-## 🧪 Testing
+# 🚀 Production Deployment
 
-Run backend tests using pytest:
-```bash
-cd backend
-.venv/Scripts/pytest
-```
-All tests should pass.
+See:
+
+- `DEPLOY_CHECKLIST.md`
+
+Production verification includes:
+
+- Alembic migrations
+- SQLite schema validation
+- Backend restart
+- Frontend build
+- Nginx reload
+- API verification
+- Curriculum verification
+
+---
+
+# 📚 Curriculum
+
+The project is designed around the **Momente A1.1** German course.
+
+Supported modules include:
+
+- Lessons
+- Vocabulary
+- Grammar
+- Listening
+- Homework
+- AI Tutor
+- Progress Tracking
+
+---
+
+# 🤝 Contributing
+
+Before submitting changes:
+
+- Read all project documentation.
+- Keep commits focused.
+- Preserve project architecture.
+- Test affected functionality.
+- Avoid unrelated refactoring.
+
+---
+
+# 📄 License
+
+Private project.
+All rights reserved.

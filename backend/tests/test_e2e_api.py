@@ -15,6 +15,25 @@ async def test_e2e_all_endpoints() -> None:
         res_health = await ac.get("/api/v1/health")
         assert res_health.status_code == 200
         assert res_health.json()["status"] == "ok"
+
+        # Register a test user
+        unique_id = int(time.time())
+        test_username = f"user_{unique_id}"
+        test_email = f"user_{unique_id}@example.com"
+        reg_res = await ac.post(
+            "/api/v1/auth/register",
+            json={"email": test_email, "username": test_username, "password": "testpassword"}
+        )
+        assert reg_res.status_code == 201
+
+        # Log in
+        login_res = await ac.post(
+            "/api/v1/auth/login",
+            json={"username": test_username, "password": "testpassword"}
+        )
+        assert login_res.status_code == 200
+        token = login_res.json()["access_token"]
+        ac.headers["Authorization"] = f"Bearer {token}"
         
         # 2. Dashboard status
         res_dash = await ac.get("/api/v1/dashboard")

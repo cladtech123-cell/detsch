@@ -54,6 +54,12 @@ class Settings(BaseSettings):
     # Vault (encryption key for the API-key vault; wired in a later phase)
     VAULT_KEY: str = ""
 
+    # Authentication
+    JWT_SECRET_KEY: str = "dev-secret-key-change-in-prod-123456"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    GOOGLE_CLIENT_ID: str = ""
+
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def _split_cors(cls, v: object) -> list[str]:

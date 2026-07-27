@@ -1,9 +1,14 @@
 import api from './api';
 
-/** Endpoints grouped by resource for the German Tutor application. */
 export const apiService = {
   // Health
   health: () => api.get('/health').then((r) => r.data),
+
+  // Auth
+  register: (data: any) => api.post('/auth/register', data).then((r) => r.data),
+  login: (data: any) => api.post('/auth/login', data).then((r) => r.data),
+  googleLogin: (credential: string) => api.post('/auth/google', { credential }).then((r) => r.data),
+  getMe: () => api.get('/auth/me').then((r) => r.data),
 
   // Dashboard
   getDashboard: () => api.get('/dashboard').then((r) => r.data),
@@ -62,13 +67,42 @@ export const apiService = {
     ai_model?: string;
   }) => api.post('/progress/update', null, { params }).then((r) => r.data),
 
+  // Study Session Logging
+  logStudySession: (data: {
+    activity_type: string;
+    xp_earned: number;
+    duration_minutes?: number;
+    lesson_number?: number;
+  }) => api.post('/progress/log-session', data).then((r) => r.data),
+
+  // Activity Chart
+  getActivityData: () => api.get('/progress/activity').then((r) => r.data),
+
   // AI Connection Test
   testAIConnection: (provider: string, model: string | null = null) =>
     api.post('/ai/test-connection', { provider, model }).then((r) => r.data),
 
   // Exams
   generateExam: (exam_type: string) => api.post(`/exams/generate?exam_type=${exam_type}`).then((r) => r.data),
+  submitExamResult: (data: {
+    exam_type: string;
+    title: string;
+    score: number;
+    correct_count: number;
+    total_questions: number;
+    lesson_number?: number;
+    time_taken_seconds?: number;
+    questions_json?: Record<string, any>;
+  }) => api.post('/exams/submit', data).then((r) => r.data),
+  getExamHistory: () => api.get('/exams/history').then((r) => r.data),
 
   // Reports
   getWeeklyReport: () => api.get('/reports/weekly').then((r) => r.data),
+
+  // Curriculum
+  getCurriculumBooks: () => api.get('/curriculum/books').then((r) => r.data),
+  getCurriculumLessons: () => api.get('/curriculum/lessons').then((r) => r.data),
+  getCurriculumLesson: (book_code: string, lesson_number: number) =>
+    api.get(`/curriculum/lessons/${book_code}/${lesson_number}`).then((r) => r.data),
+  seedCurriculum: () => api.post('/curriculum/seed').then((r) => r.data),
 };

@@ -40,6 +40,50 @@ class VocabularySchema(BaseModel):
     next_review: date
     ease_factor: float
     times_reviewed: int
+    article: str | None = None
+    plural: str | None = None
+    pronunciation: str | None = None
+    ipa: str | None = None
+    audio_url: str | None = None
+    textbook_page: int | None = None
+    lesson_number: int | None = None
+    mastery_percentage: int = 0
+    mistake_count: int = 0
+    review_history_json: list[dict[str, Any]] = []
+
+    class Config:
+        from_attributes = True
+
+
+class CurriculumBookSchema(BaseModel):
+    id: int
+    code: str
+    title: str
+    cefr: str
+
+    class Config:
+        from_attributes = True
+
+
+class CurriculumLessonSchema(BaseModel):
+    id: int
+    book_code: str
+    number: int
+    title_uz: str
+    title_de: str
+    description_uz: str
+    description_de: str
+    grammar_title: str
+    grammar_explanation: str
+    grammar_examples_json: list[dict[str, str]]
+    listening_dialogue: str
+    listening_quiz_json: list[dict[str, Any]]
+    reading_passage: str
+    reading_quiz_json: list[dict[str, Any]]
+    writing_prompt: str
+    speaking_topic: str
+    quiz_questions_json: list[dict[str, Any]]
+    vocabulary_json: list[dict[str, Any]]
 
     class Config:
         from_attributes = True
@@ -189,3 +233,58 @@ class BulkImportResponse(BaseModel):
     imported: int
     skipped: int
     failed: int
+
+
+# Study Session schemas
+class StudySessionCreate(BaseModel):
+    activity_type: str = "general"
+    xp_earned: int = 0
+    duration_minutes: int = 0
+    lesson_number: int | None = None
+
+
+class StudySessionSchema(BaseModel):
+    id: int
+    session_date: date
+    activity_type: str
+    xp_earned: int
+    duration_minutes: int
+    lesson_number: int | None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ActivityDaySchema(BaseModel):
+    date_str: str
+    day_abbr: str
+    xp: int
+    is_today: bool
+
+
+# Exam Result schemas
+class ExamResultCreate(BaseModel):
+    exam_type: str
+    title: str
+    score: int
+    correct_count: int
+    total_questions: int
+    lesson_number: int | None = None
+    time_taken_seconds: int = 0
+    questions_json: dict[str, Any] = {}
+
+
+class ExamResultSchema(BaseModel):
+    id: int
+    exam_type: str
+    title: str
+    score: int
+    correct_count: int
+    total_questions: int
+    lesson_number: int | None
+    time_taken_seconds: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

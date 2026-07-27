@@ -8,8 +8,10 @@ from sqlalchemy import select
 
 from app.models.german import (
     ChatMessage,
+    CurriculumLesson,
     HomeworkSubmission,
     MistakeLog,
+    StudySession,
     Vocabulary,
 )
 from app.repositories.german import GermanRepository
@@ -80,7 +82,7 @@ class GermanService:
             "vocab_due_today": vocab_due_today,
             "grammar_completed": grammar_completed,
             "grammar_total": grammar_total,
-            "weekly_goal_progress": 4.5 / progress.weekly_goal_hours,
+            "weekly_goal_progress": 4.5 / max(1, progress.weekly_goal_hours),
             "today_tasks": today_tasks,
             "recent_mistakes": recent_mistakes
         }
@@ -101,6 +103,41 @@ class GermanService:
         course_context = f"Course: {progress.current_course}, Lesson: Lektion {progress.current_lesson}, Target: {progress.target_level}"
         ai = get_ai_provider(provider_name=progress.ai_provider, model_name=progress.ai_model)
 
+        # --- Fetch curriculum lesson context for AI enrichment ---
+        book_code = progress.current_course.replace("Momente ", "")
+        lesson_res = await self.repo.db.execute(
+            select(CurriculumLesson).filter(
+                CurriculumLesson.book_code == book_code,
+                CurriculumLesson.number == progress.current_lesson
+            )
+        )
+        curr_lesson = lesson_res.scalars().first()
+
+        vocab_context = ""
+        grammar_context = ""
+        speaking_topic_context = ""
+        if curr_lesson:
+            vocab_words = [v.get("german", "") for v in (curr_lesson.vocabulary_json or [])[:10] if v.get("german")]
+            if vocab_words:
+                vocab_context = f"Current lesson vocabulary to practice: {', '.join(vocab_words)}. "
+            if curr_lesson.grammar_title:
+                grammar_context = (
+                    f"Grammar focus: {curr_lesson.grammar_title}. "
+                    f"Rule: {curr_lesson.grammar_explanation[:250]}. "
+                )
+            if curr_lesson.speaking_topic:
+                speaking_topic_context = f"Suggested speaking topic: {curr_lesson.speaking_topic}. "
+
+        # --- Get recent mistake patterns ---
+        recent_mistakes = await self.repo.get_recent_mistakes(limit=3)
+        mistake_context = ""
+        if recent_mistakes:
+            mistake_patterns = [
+                f'{m.category}: "{m.incorrect_text}" → "{m.corrected_text}"'
+                for m in recent_mistakes
+            ]
+            mistake_context = f"Watch for these recurring mistakes: {'; '.join(mistake_patterns)}. "
+
         # Check grammar mistakes asynchronously via AI
         analysis_prompt = (
             f"Analyze this German input: \"{user_content}\". Check for mistakes. "
@@ -116,7 +153,7 @@ class GermanService:
                 existing = await self.repo.get_mistake_by_text_and_category(inc, cat)
                 if existing:
                     existing.occurrence_count += 1
-                    await self.repo.update_progress(progress) # trigger save
+                    await self.repo.update_progress(progress)  # trigger save
                 else:
                     mistake = MistakeLog(
                         category=cat,
@@ -129,14 +166,20 @@ class GermanService:
         except Exception:
             pass
 
-        # Generate conversational response
+        # --- Build curriculum-aware system instruction ---
         system_instruction = (
-            f"You are a strict, helpful German Language Tutor. The user is Dean. "
-            f"Context: {course_context}. "
-            f"RULES:\n"
-            f"1. Speak German. A1-A2 levels.\n"
-            f"2. Correct errors first in German and explain rules in Uzbek (with English fallback).\n"
-            f"3. Keep responses under 4 sentences."
+            f"You are an expert, warm but pedagogically strict German Language Tutor. "
+            f"You are teaching Momente {progress.current_course}, Lektion {progress.current_lesson}. "
+            f"{grammar_context}"
+            f"{vocab_context}"
+            f"{speaking_topic_context}"
+            f"{mistake_context}"
+            f"CRITICAL RULES:\n"
+            f"1. Always respond primarily in German at A1-A2 level appropriate for a beginner.\n"
+            f"2. When the student makes a grammar or vocabulary mistake, IMMEDIATELY correct it in German and then explain the rule clearly in Uzbek (with English in parentheses as fallback).\n"
+            f"3. Keep responses focused and under 4-5 sentences.\n"
+            f"4. Actively encourage the student to use the current lesson's vocabulary and practice the grammar topic.\n"
+            f"5. Be encouraging - celebrate correct usage and small wins."
         )
 
         tutor_reply = await ai.chat_response(
@@ -147,12 +190,22 @@ class GermanService:
 
         tutor_msg = ChatMessage(role="assistant", content=tutor_reply)
         await self.repo.add_chat_message(tutor_msg)
-        
+
+        # Log AI tutor study session
+        session = StudySession(
+            session_date=date.today(),
+            activity_type="ai_tutor",
+            xp_earned=15,
+            duration_minutes=1,
+            lesson_number=progress.current_lesson,
+        )
+        await self.repo.log_study_session(session)
+
         # Get actual provider name and model after execution/failovers
         provider_info = "Powered by Gemini • gemini-2.0-flash"
         if hasattr(ai, "get_active_provider_info"):
             provider_info = ai.get_active_provider_info()
-            
+
         return tutor_msg, provider_info
 
     async def process_vocab_review(self, word_id: int, is_correct: bool) -> Vocabulary:
@@ -169,13 +222,28 @@ class GermanService:
                 word.box += 1
             word.interval_days = box_intervals[word.box]
             word.ease_factor = min(word.ease_factor + 0.15, 3.0)
+            word.mastery_percentage = min(100, word.mastery_percentage + 20)
         else:
             word.box = 1
             word.interval_days = box_intervals[1]
             word.ease_factor = max(word.ease_factor - 0.2, 1.3)
+            word.mistake_count = word.mistake_count + 1
+            word.mastery_percentage = max(0, word.mastery_percentage - 10)
 
         word.next_review = date.today() + timedelta(days=word.interval_days)
         await self.repo.db.commit()
+
+        # Log vocab review study session
+        progress = await self.repo.get_progress()
+        session = StudySession(
+            session_date=date.today(),
+            activity_type="vocab",
+            xp_earned=10 if is_correct else 2,
+            duration_minutes=1,
+            lesson_number=progress.current_lesson,
+        )
+        await self.repo.log_study_session(session)
+
         return word
 
     async def grade_homework(self, title: str, raw_content: str, file_type: str) -> HomeworkSubmission:

@@ -52,6 +52,12 @@ def create_app() -> FastAPI:
     # Mount the v1 API.
     app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
+    @app.on_event("startup")
+    async def on_startup():
+        from app.core.database import Base, engine
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
     @app.get("/", include_in_schema=False)
     async def root() -> dict:
         """Root redirect-ish landing so `/` is not a bare 404."""

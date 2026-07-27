@@ -8,9 +8,16 @@ from app.repositories.german import GermanRepository
 from app.services.german_service import GermanService
 
 
-async def get_german_repo(db: AsyncSession = Depends(get_db)) -> GermanRepository:
+from app.api.deps import get_current_user
+from app.models.german import User
+
+
+async def get_german_repo(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> GermanRepository:
     """FastAPI dependency yielding a GermanRepository instance."""
-    return GermanRepository(db)
+    return GermanRepository(db, user_id=current_user.id)
 
 
 async def get_german_service(repo: GermanRepository = Depends(get_german_repo)) -> GermanService:
