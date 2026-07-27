@@ -23,6 +23,7 @@ httpx==0.28.1
 
 # Vault encryption (passwords/keys)
 cryptography==44.0.0
+bcrypt==4.2.0
 
 # ----------------------------------------------------------------------------
 # Development tooling
