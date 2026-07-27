@@ -22,6 +22,9 @@ class UserProgressSchema(BaseModel):
     vocabulary_level: str
     ai_provider: str | None = "gemini"
     ai_model: str | None = "gemini-2.5-flash"
+    completed_lessons: list[int] = []
+    lesson_progress: dict[str, dict[str, bool]] = {}
+    completed_grammar_topics: list[int] = []
 
     class Config:
         from_attributes = True
@@ -185,6 +188,7 @@ class DashboardData(BaseModel):
     weekly_goal_progress: float
     today_tasks: list[str]
     recent_mistakes: list[MistakeSchema]
+    today_xp: int = 0
 
 
 class WeeklyReportData(BaseModel):

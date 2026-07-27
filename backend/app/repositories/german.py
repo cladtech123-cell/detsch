@@ -31,15 +31,18 @@ class GermanRepository:
                 user_id=self.user_id,
                 current_course="Momente A1.1",
                 current_lesson=7,
-                study_streak=3,
-                last_study_date=date.today(),
+                study_streak=0,
+                last_study_date=None,
                 weekly_goal_hours=10.0,
                 reading_level="A1.1",
                 listening_level="A1.1",
                 writing_level="A1.1",
                 speaking_level="A1.1",
                 grammar_level="A1.1",
-                vocabulary_level="A1.1"
+                vocabulary_level="A1.1",
+                completed_lessons=[],
+                lesson_progress={"7": {"einstieg": True, "wortschatz": True, "grammatik": True}},
+                completed_grammar_topics=[]
             )
             self.db.add(progress)
             await self.db.commit()
@@ -232,6 +235,26 @@ class GermanRepository:
             key = s.session_date.isoformat()
             xp_map[key] = xp_map.get(key, 0) + s.xp_earned
         return xp_map
+
+    async def get_weekly_study_hours(self) -> float:
+        """Returns the total study hours accumulated in the current week (since Monday)."""
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        result = await self.db.execute(
+            select(func.sum(StudySession.duration_minutes))
+            .filter(StudySession.user_id == self.user_id, StudySession.session_date >= start_of_week)
+        )
+        minutes = result.scalar() or 0
+        return float(minutes) / 60.0
+
+    async def get_today_xp(self) -> int:
+        """Returns the total XP earned by the user today."""
+        today = date.today()
+        result = await self.db.execute(
+            select(func.sum(StudySession.xp_earned))
+            .filter(StudySession.user_id == self.user_id, StudySession.session_date == today)
+        )
+        return result.scalar() or 0
 
     # --- ExamResult ---
     async def save_exam_result(self, exam_result: ExamResult) -> ExamResult:

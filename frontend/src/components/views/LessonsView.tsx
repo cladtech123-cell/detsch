@@ -79,37 +79,50 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
     }
   }, [progress]);
 
-  // Load checklist for selected lesson
+  // Load checklist for selected lesson from database progress
   useEffect(() => {
-    const saved = localStorage.getItem(`dm_momente_chk_${selectedLessonNumber}`);
-    if (saved) {
-      setCompletions(JSON.parse(saved));
+    const emptyVal = {
+      einstieg: false,
+      wortschatz: false,
+      grammatik: false,
+      hoeren: false,
+      lesen: false,
+      schreiben: false,
+      sprechen: false,
+      uebungen: false,
+      quiz: false,
+      wiederholung: false,
+    };
+    const key = selectedLessonNumber.toString();
+    if (progress?.lesson_progress?.[key]) {
+      setCompletions({
+        ...emptyVal,
+        ...progress.lesson_progress[key]
+      });
     } else {
-      // Default Lektion 7 with partial progress to align with current states
+      // Default Lektion 7 with partial progress if not initialized
       if (selectedLessonNumber === 7) {
-        const initVal = {
-          einstieg: true, wortschatz: true, grammatik: true,
-          hoeren: false, lesen: false, schreiben: false,
-          sprechen: false, uebungen: false, quiz: false, wiederholung: false
-        };
-        setCompletions(initVal);
-        localStorage.setItem(`dm_momente_chk_7`, JSON.stringify(initVal));
+        setCompletions({
+          einstieg: true,
+          wortschatz: true,
+          grammatik: true,
+          hoeren: false,
+          lesen: false,
+          schreiben: false,
+          sprechen: false,
+          uebungen: false,
+          quiz: false,
+          wiederholung: false,
+        });
       } else {
-        const emptyVal = {
-          einstieg: false, wortschatz: false, grammatik: false,
-          hoeren: false, lesen: false, schreiben: false,
-          sprechen: false, uebungen: false, quiz: false, wiederholung: false
-        };
         setCompletions(emptyVal);
-        localStorage.setItem(`dm_momente_chk_${selectedLessonNumber}`, JSON.stringify(emptyVal));
       }
     }
-  }, [selectedLessonNumber]);
+  }, [progress, selectedLessonNumber]);
 
   const markComplete = async (tab: TabMode) => {
     const updated = { ...completions, [tab]: true };
     setCompletions(updated);
-    localStorage.setItem(`dm_momente_chk_${selectedLessonNumber}`, JSON.stringify(updated));
 
     // Calculate dynamic percentage
     const completedCount = Object.values(updated).filter(Boolean).length;
@@ -127,6 +140,15 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
       queryClient.invalidateQueries({ queryKey: ['activity'] });
     } catch {
       // Non-critical if session logging fails
+    }
+
+    // Save section completion to backend database
+    try {
+      await apiService.completeLessonSection(selectedLessonNumber, tab);
+      queryClient.invalidateQueries({ queryKey: ['progress'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    } catch (err) {
+      console.error("Failed to sync completion status to database:", err);
     }
 
     // If 100% completed, auto-advance backend lesson level

@@ -47,6 +47,11 @@ class UserProgress(Base):
     grammar_level: Mapped[str] = mapped_column(String(10), default="A1.1")
     vocabulary_level: Mapped[str] = mapped_column(String(10), default="A1.1")
 
+    # User-independent tracking fields
+    completed_lessons: Mapped[list[int]] = mapped_column(JSON, default=list)
+    lesson_progress: Mapped[dict[str, dict[str, bool]]] = mapped_column(JSON, default=dict)
+    completed_grammar_topics: Mapped[list[int]] = mapped_column(JSON, default=list)
+
 
 class Vocabulary(Base):
     """Vocabulary cards with spaced repetition stats."""

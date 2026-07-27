@@ -40,7 +40,14 @@ async def check_and_seed_grammar(repo: GermanRepository):
 async def list_grammar_topics(repo: GermanRepository = Depends(get_german_repo)):
     await check_and_seed_grammar(repo)
     topics = await repo.get_all_grammar_topics()
-    return [GrammarTopicSchema.from_orm(t) for t in topics]
+    progress = await repo.get_progress()
+    completed_set = set(progress.completed_grammar_topics or [])
+    results = []
+    for t in topics:
+        schema = GrammarTopicSchema.from_orm(t)
+        schema.is_completed = t.id in completed_set
+        results.append(schema)
+    return results
 
 
 @router.get("/grammar/{topic_id}", response_model=GrammarTopicSchema, summary="Get details of a specific grammar topic")
@@ -48,7 +55,10 @@ async def get_grammar_topic(topic_id: int, repo: GermanRepository = Depends(get_
     topic = await repo.get_grammar_topic_by_id(topic_id)
     if not topic:
         raise HTTPException(status_code=404, detail="Mavzu topilmadi.")
-    return GrammarTopicSchema.from_orm(topic)
+    progress = await repo.get_progress()
+    schema = GrammarTopicSchema.from_orm(topic)
+    schema.is_completed = topic_id in (progress.completed_grammar_topics or [])
+    return schema
 
 
 @router.post("/grammar/{topic_id}/toggle-complete", response_model=GrammarTopicSchema, summary="Toggle completion status of a grammar topic")
@@ -57,9 +67,21 @@ async def toggle_grammar_complete(topic_id: int, repo: GermanRepository = Depend
     if not topic:
         raise HTTPException(status_code=404, detail="Mavzu topilmadi.")
 
-    topic.is_completed = not topic.is_completed
-    await repo.update_progress(await repo.get_progress()) # trigger save
-    return GrammarTopicSchema.from_orm(topic)
+    progress = await repo.get_progress()
+    completed = list(progress.completed_grammar_topics or [])
+    is_completed = topic_id in completed
+    if is_completed:
+        completed.remove(topic_id)
+        is_completed = False
+    else:
+        completed.append(topic_id)
+        is_completed = True
+    progress.completed_grammar_topics = completed
+    await repo.update_progress(progress)
+
+    schema = GrammarTopicSchema.from_orm(topic)
+    schema.is_completed = is_completed
+    return schema
 
 
 @router.post("/grammar/quiz", summary="Check quiz answers and provide Uzbek feedback")
@@ -97,9 +119,13 @@ async def submit_grammar_quiz(
             }
 
     # If user got 100% correct, mark topic as complete
-    if correct_count == total and not topic.is_completed:
-        topic.is_completed = True
-        await repo.update_progress(await repo.get_progress()) # trigger save
+    if correct_count == total:
+        progress = await repo.get_progress()
+        completed = list(progress.completed_grammar_topics or [])
+        if topic.id not in completed:
+            completed.append(topic.id)
+            progress.completed_grammar_topics = completed
+            await repo.update_progress(progress)
 
     return {
         "score": int((correct_count / total) * 100) if total > 0 else 0,

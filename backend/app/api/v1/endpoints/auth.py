@@ -103,7 +103,10 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
         writing_level="A1.1",
         speaking_level="A1.1",
         grammar_level="A1.1",
-        vocabulary_level="A1.1"
+        vocabulary_level="A1.1",
+        completed_lessons=[],
+        lesson_progress={"7": {"einstieg": True, "wortschatz": True, "grammatik": True}},
+        completed_grammar_topics=[]
     )
     db.add(progress)
     await db.commit()

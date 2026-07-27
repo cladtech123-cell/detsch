@@ -28,8 +28,6 @@ interface DashboardViewProps {
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ user, lang, setActiveTab, vocabList }) => {
   const [showCurriculumModal, setShowCurriculumModal] = useState(false);
-  const [displayProgress, setDisplayProgress] = useState(0);
-
   const t = (key: string) => i18nTranslations[lang][key] || key;
 
   // Query live dashboard payload from SQLite
@@ -68,23 +66,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ user, lang, setAct
     }
   };
 
-  // Compute progress percentage dynamically based on the lesson checklist
-  useEffect(() => {
-    if (currentLessonNumber) {
-      const saved = localStorage.getItem(`dm_lesson_chk_${currentLessonNumber}`);
-      if (saved) {
-        try {
-          const chk = JSON.parse(saved);
-          const completedCount = Object.values(chk).filter(Boolean).length;
-          setDisplayProgress(Math.round((completedCount / 5) * 100));
-        } catch {
-          setDisplayProgress(currentLessonNumber === 7 ? 85 : 0);
-        }
-      } else {
-        setDisplayProgress(currentLessonNumber === 7 ? 85 : 0);
-      }
-    }
-  }, [currentLessonNumber]);
+  const displayProgress = dbData?.progress_percentage ?? 0;
 
   const speakWord = (word: string) => {
     if ('speechSynthesis' in window) {
@@ -251,12 +233,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ user, lang, setAct
           <div className="bg-surface-variant p-4 rounded-2xl border border-border">
             <div className="flex justify-between text-[11px] text-on-surface font-semibold mb-2">
               <span>Kunlik Maqsad</span>
-              <span>{dbData.streak * 15} / {user.dailyGoalXp} XP</span>
+              <span>{dbData.today_xp} / {user.dailyGoalXp} XP</span>
             </div>
             <div className="w-full h-1.5 bg-border rounded-full overflow-hidden mb-2">
               <div
                 className="h-full bg-primary rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, ((dbData.streak * 15) / user.dailyGoalXp) * 100)}%` }}
+                style={{ width: `${Math.min(100, (dbData.today_xp / user.dailyGoalXp) * 100)}%` }}
               />
             </div>
             <p className="text-[10px] text-on-surface-variant leading-relaxed">
@@ -308,14 +290,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ user, lang, setAct
             </>
           ) : (
             <div className="flex items-end justify-between h-36 gap-2 mb-4">
-              {[40, 65, 85, 60, 45, 20, 15].map((h, idx) => (
+              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end">
-                  <div
-                    className={`w-full rounded-t-md ${
-                      idx === 3 ? 'bg-primary/25' : 'bg-primary/15'
-                    }`}
-                    style={{ height: `${h}%` }}
-                  />
+                  <div className="w-full rounded-t-md bg-border/40" style={{ height: '4%' }} />
                 </div>
               ))}
             </div>

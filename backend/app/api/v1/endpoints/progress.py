@@ -112,3 +112,33 @@ async def get_activity(repo: GermanRepository = Depends(get_german_repo)):
             is_today=(d == today),
         ))
     return result
+
+
+@router.post("/progress/lesson/section", response_model=UserProgressSchema, summary="Mark a specific lesson section as completed")
+async def complete_lesson_section(
+    lesson_number: int,
+    section_name: str,
+    repo: GermanRepository = Depends(get_german_repo)
+):
+    progress = await repo.get_progress()
+
+    lesson_progress_dict = dict(progress.lesson_progress or {})
+    lesson_key = str(lesson_number)
+    if lesson_key not in lesson_progress_dict:
+        lesson_progress_dict[lesson_key] = {}
+
+    sections = dict(lesson_progress_dict[lesson_key])
+    sections[section_name] = True
+    lesson_progress_dict[lesson_key] = sections
+    progress.lesson_progress = lesson_progress_dict
+
+    # Check if 100% complete (10 sections completed)
+    completed_count = sum(1 for completed in sections.values() if completed)
+    if completed_count == 10:
+        completed_lessons_list = list(progress.completed_lessons or [])
+        if lesson_number not in completed_lessons_list:
+            completed_lessons_list.append(lesson_number)
+            progress.completed_lessons = completed_lessons_list
+
+    updated = await repo.update_progress(progress)
+    return UserProgressSchema.from_orm(updated)

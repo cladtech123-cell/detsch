@@ -66,6 +66,8 @@ export const apiService = {
     ai_provider?: string;
     ai_model?: string;
   }) => api.post('/progress/update', null, { params }).then((r) => r.data),
+  completeLessonSection: (lesson_number: number, section_name: string) =>
+    api.post(`/progress/lesson/section?lesson_number=${lesson_number}&section_name=${section_name}`).then((r) => r.data),
 
   // Study Session Logging
   logStudySession: (data: {

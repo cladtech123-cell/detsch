@@ -43,6 +43,13 @@ class GermanService:
 
         today_tasks.append(f"Kutubxonadagi Lektion {progress.current_lesson} bo'yicha gapirish mashqini bajaring")
 
+        # Get completion percentage of the current lesson
+        lesson_progress_dict = progress.lesson_progress or {}
+        curr_lesson_str = str(progress.current_lesson)
+        curr_lesson_completions = lesson_progress_dict.get(curr_lesson_str, {})
+        completed_count = sum(1 for completed in curr_lesson_completions.values() if completed)
+        lesson_progress_pct = int((completed_count / 10) * 100) if completed_count > 0 else 0
+
         # CEFR average calculation
         levels = [
             progress.reading_level,
@@ -73,18 +80,23 @@ class GermanService:
         else:
             cefr_estimate = "B2"
 
+        weekly_study_hours = await self.repo.get_weekly_study_hours()
+        weekly_goal_progress = weekly_study_hours / max(0.1, progress.weekly_goal_hours)
+        today_xp = await self.repo.get_today_xp()
+
         return {
             "streak": progress.study_streak,
             "current_lesson": f"{progress.current_course} - Lektion {progress.current_lesson}",
             "cefr_estimate": cefr_estimate,
-            "progress_percentage": avg_progress,
+            "progress_percentage": lesson_progress_pct,  # Now represents current lesson completion percentage
             "vocab_total": vocab_total,
             "vocab_due_today": vocab_due_today,
             "grammar_completed": grammar_completed,
             "grammar_total": grammar_total,
-            "weekly_goal_progress": 4.5 / max(1, progress.weekly_goal_hours),
+            "weekly_goal_progress": weekly_goal_progress,
             "today_tasks": today_tasks,
-            "recent_mistakes": recent_mistakes
+            "recent_mistakes": recent_mistakes,
+            "today_xp": today_xp
         }
 
     async def process_chat(self, user_content: str) -> tuple[ChatMessage, str]:
