@@ -11,9 +11,14 @@ from pathlib import Path
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
 
 # Resolve project paths relative to this file so they work regardless of CWD.
 BACKEND_ROOT = Path(__file__).resolve().parent.parent.parent
+
+# Explicitly load environment variables from the .env file
+load_dotenv(dotenv_path=BACKEND_ROOT / ".env")
+
 
 
 class Settings(BaseSettings):
