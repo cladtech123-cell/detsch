@@ -47,8 +47,15 @@ class FailoverAIProvider(BaseAIProvider):
             try:
                 res = await provider.generate_content(prompt, system_instruction, json_mode)
                 # Check for standard error payloads
-                if "quota has been exceeded" in res or "AI xizmati vaqtincha ishlamayapti" in res:
-                    logger.warning(f"Failover trigger: {provider.__class__.__name__} returned error message. Trying next fallback...")
+                is_error = (
+                    "quota has been exceeded" in res.lower() 
+                    or "ai xizmati vaqtincha ishlamayapti" in res.lower() 
+                    or res.startswith("Xatolik:") 
+                    or "error" in res.lower() 
+                    or "unauthorized" in res.lower()
+                )
+                if is_error:
+                    logger.warning(f"Failover trigger: {provider.__class__.__name__} returned error message: {res}. Trying next fallback...")
                     continue
                 return res
             except Exception as e:
@@ -68,8 +75,15 @@ class FailoverAIProvider(BaseAIProvider):
             self.last_active_provider = provider
             try:
                 res = await provider.chat_response(history, message, system_instruction, json_mode)
-                if "quota has been exceeded" in res or "AI xizmati vaqtincha ishlamayapti" in res:
-                    logger.warning(f"Failover trigger: {provider.__class__.__name__} returned error message. Trying next fallback...")
+                is_error = (
+                    "quota has been exceeded" in res.lower() 
+                    or "ai xizmati vaqtincha ishlamayapti" in res.lower() 
+                    or res.startswith("Xatolik:") 
+                    or "error" in res.lower() 
+                    or "unauthorized" in res.lower()
+                )
+                if is_error:
+                    logger.warning(f"Failover trigger: {provider.__class__.__name__} returned error message: {res}. Trying next fallback...")
                     continue
                 return res
             except Exception as e:

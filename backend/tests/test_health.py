@@ -14,6 +14,11 @@ def test_health_ok() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "ok"
+    assert "config_status" in body
+    assert "gemini_api_key_configured" in body["config_status"]
+    assert "database_url_configured" in body["config_status"]
+    assert isinstance(body["config_status"]["gemini_api_key_configured"], bool)
+
 
 
 def test_root() -> None:
