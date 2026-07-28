@@ -136,7 +136,20 @@ async def test_e2e_all_endpoints() -> None:
         assert "questions" in json_data or "error" in json_data
 
         # 12. Exams submit (verification of score calculation, correct/incorrect, edge cases, percentages)
+        from app.api.v1.endpoints.exams import generate_exam_signature
+
         # Case A: Correct answers and correct percentage calculation (4/5 = 80%)
+        case_a_questions = [
+            {"id": "q1", "answer": "wohne"},
+            {"id": "q2", "answer": "hat"},
+            {"id": "q3", "answer": "heißen"},
+            {"id": "q4", "answer": "kommen"},
+            {"id": "q5", "answer": "spielt"}
+        ]
+        case_a_sig = generate_exam_signature(case_a_questions)
+        for q in case_a_questions:
+            q["signature"] = case_a_sig
+
         res_submit = await ac.post(
             "/api/v1/exams/submit",
             json={
@@ -146,13 +159,7 @@ async def test_e2e_all_endpoints() -> None:
                 "correct_count": 0,
                 "total_questions": 0,
                 "questions_json": {
-                    "questions": [
-                        {"id": "q1", "answer": "wohne"},
-                        {"id": "q2", "answer": "hat"},
-                        {"id": "q3", "answer": "heißen"},
-                        {"id": "q4", "answer": "kommen"},
-                        {"id": "q5", "answer": "spielt"}
-                    ],
+                    "questions": case_a_questions,
                     "answers": {
                         "q1": "wohne",
                         "q2": "hat",
@@ -191,6 +198,16 @@ async def test_e2e_all_endpoints() -> None:
         assert data_submit_empty["total_questions"] == 0
 
         # Case C: Case insensitivity and whitespace handling (3/4 = 75%)
+        case_c_questions = [
+            {"id": "q1", "answer": "wohne"},
+            {"id": "q2", "answer": "hat"},
+            {"id": "q3", "answer": "heißen"},
+            {"id": "q4", "answer": "kommen"}
+        ]
+        case_c_sig = generate_exam_signature(case_c_questions)
+        for q in case_c_questions:
+            q["signature"] = case_c_sig
+
         res_submit_whitespace = await ac.post(
             "/api/v1/exams/submit",
             json={
@@ -200,12 +217,7 @@ async def test_e2e_all_endpoints() -> None:
                 "correct_count": 0,
                 "total_questions": 0,
                 "questions_json": {
-                    "questions": [
-                        {"id": "q1", "answer": "wohne"},
-                        {"id": "q2", "answer": "hat"},
-                        {"id": "q3", "answer": "heißen"},
-                        {"id": "q4", "answer": "kommen"}
-                    ],
+                    "questions": case_c_questions,
                     "answers": {
                         "q1": "  WOHNE  ",  # correct despite whitespace and case
                         "q2": "HAT",          # correct despite case
@@ -222,6 +234,15 @@ async def test_e2e_all_endpoints() -> None:
         assert data_submit_whitespace["total_questions"] == 4
 
         # Case D: Rounding check (2/3 = 66.666% -> 67%)
+        case_d_questions = [
+            {"id": "q1", "answer": "a"},
+            {"id": "q2", "answer": "b"},
+            {"id": "q3", "answer": "c"}
+        ]
+        case_d_sig = generate_exam_signature(case_d_questions)
+        for q in case_d_questions:
+            q["signature"] = case_d_sig
+
         res_submit_round = await ac.post(
             "/api/v1/exams/submit",
             json={
@@ -231,11 +252,7 @@ async def test_e2e_all_endpoints() -> None:
                 "correct_count": 0,
                 "total_questions": 0,
                 "questions_json": {
-                    "questions": [
-                        {"id": "q1", "answer": "a"},
-                        {"id": "q2", "answer": "b"},
-                        {"id": "q3", "answer": "c"}
-                    ],
+                    "questions": case_d_questions,
                     "answers": {
                         "q1": "a",
                         "q2": "b",
@@ -247,4 +264,49 @@ async def test_e2e_all_endpoints() -> None:
         assert res_submit_round.status_code == 200
         data_submit_round = res_submit_round.json()
         assert data_submit_round["score"] == 67
+
+        # Case E: Tampering check (Modified answer with invalid signature)
+        res_submit_tampered = await ac.post(
+            "/api/v1/exams/submit",
+            json={
+                "exam_type": "lesson",
+                "title": "Tampered Quiz",
+                "score": 0,
+                "correct_count": 0,
+                "total_questions": 0,
+                "questions_json": {
+                    "questions": [
+                        {"id": "q1", "answer": "tampered_answer", "signature": generate_exam_signature([{"id": "q1", "answer": "original_answer"}])}
+                    ],
+                    "answers": {
+                        "q1": "tampered_answer"
+                    }
+                }
+            }
+        )
+        assert res_submit_tampered.status_code == 400
+        assert "integrity" in res_submit_tampered.json()["detail"].lower()
+
+        # Case F: Dropping/Adding questions tampering check (Invalid signature due to count change)
+        res_submit_incomplete = await ac.post(
+            "/api/v1/exams/submit",
+            json={
+                "exam_type": "lesson",
+                "title": "Tampered Incomplete Quiz",
+                "score": 0,
+                "correct_count": 0,
+                "total_questions": 0,
+                "questions_json": {
+                    # Signed with 2 questions, but only submitting 1 to inflate percentage
+                    "questions": [
+                        {"id": "q1", "answer": "a", "signature": generate_exam_signature([{"id": "q1", "answer": "a"}, {"id": "q2", "answer": "b"}])}
+                    ],
+                    "answers": {
+                        "q1": "a"
+                    }
+                }
+            }
+        )
+        assert res_submit_incomplete.status_code == 400
+        assert "integrity" in res_submit_incomplete.json()["detail"].lower()
 

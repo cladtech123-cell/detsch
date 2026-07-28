@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.config import settings
 from app.core.dependencies import get_german_repo
 from app.repositories.german import GermanRepository
 from app.models.german import ExamResult
@@ -11,6 +15,23 @@ from app.schemas.german import ExamResultCreate, ExamResultSchema
 from app.services.ai import get_ai_provider
 
 router = APIRouter()
+
+
+def generate_exam_signature(questions: list[dict[str, Any]]) -> str:
+    """Generate a single HMAC-SHA256 signature for the entire set of questions to prevent tampering, adding, or deleting questions."""
+    # Canonicalize by sorting questions by their ID
+    sorted_questions = sorted(questions, key=lambda x: str(x.get("id", "")))
+
+    # Create a canonical representation of the IDs and correct answers
+    serialized_parts = []
+    for q in sorted_questions:
+        q_id = str(q.get("id", ""))
+        q_ans = str(q.get("answer", ""))
+        serialized_parts.append(f"{q_id}:{q_ans}")
+
+    canonical_string = "|".join(serialized_parts)
+    message = canonical_string.encode("utf-8")
+    return hmac.new(settings.JWT_SECRET_KEY.encode("utf-8"), message, hashlib.sha256).hexdigest()
 
 
 @router.post("/exams/generate", summary="Generate custom quiz/exam based on lesson or past mistakes")
@@ -97,9 +118,10 @@ async def generate_exam(
             json_mode=True
         )
         quiz_data = json.loads(res)
-        return quiz_data
+        if not isinstance(quiz_data, dict) or "questions" not in quiz_data:
+            raise ValueError("Invalid quiz structure")
     except Exception:
-        return {
+        quiz_data = {
             "title": f"{lesson_name} Fallback Quiz",
             "questions": [
                 {
@@ -140,6 +162,14 @@ async def generate_exam(
             ]
         }
 
+    # Inject signature to each question to prevent payload tampering (all carry the same total exam signature)
+    sig = generate_exam_signature(quiz_data.get("questions", []))
+    for q in quiz_data.get("questions", []):
+        if isinstance(q, dict):
+            q["signature"] = sig
+
+    return quiz_data
+
 
 @router.post("/exams/submit", response_model=ExamResultSchema, summary="Save exam result to database")
 async def submit_exam_result(
@@ -156,6 +186,22 @@ async def submit_exam_result(
 
     correct_count = 0
     total_questions = len(questions)
+
+    if questions:
+        # Extract signature from the first question
+        signature = questions[0].get("signature", "")
+        if not signature:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid exam question structure or missing signature."
+            )
+
+        expected_sig = generate_exam_signature(questions)
+        if not hmac.compare_digest(signature, expected_sig):
+            raise HTTPException(
+                status_code=400,
+                detail="Exam integrity check failed. Modified, added, or deleted questions detected."
+            )
 
     for q in questions:
         q_id = q.get("id")
