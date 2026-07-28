@@ -134,3 +134,117 @@ async def test_e2e_all_endpoints() -> None:
         assert res_exam.status_code == 200
         json_data = res_exam.json()
         assert "questions" in json_data or "error" in json_data
+
+        # 12. Exams submit (verification of score calculation, correct/incorrect, edge cases, percentages)
+        # Case A: Correct answers and correct percentage calculation (4/5 = 80%)
+        res_submit = await ac.post(
+            "/api/v1/exams/submit",
+            json={
+                "exam_type": "lesson",
+                "title": "Lektion 8 Review Quiz",
+                "score": 0,  # Should be recalculated to 80 on backend
+                "correct_count": 0,
+                "total_questions": 0,
+                "questions_json": {
+                    "questions": [
+                        {"id": "q1", "answer": "wohne"},
+                        {"id": "q2", "answer": "hat"},
+                        {"id": "q3", "answer": "heißen"},
+                        {"id": "q4", "answer": "kommen"},
+                        {"id": "q5", "answer": "spielt"}
+                    ],
+                    "answers": {
+                        "q1": "wohne",
+                        "q2": "hat",
+                        "q3": "heißen",
+                        "q4": "kommen",
+                        "q5": "wrong"
+                    }
+                }
+            }
+        )
+        assert res_submit.status_code == 200
+        data_submit = res_submit.json()
+        assert data_submit["score"] == 80
+        assert data_submit["correct_count"] == 4
+        assert data_submit["total_questions"] == 5
+
+        # Case B: Edge case - empty questions
+        res_submit_empty = await ac.post(
+            "/api/v1/exams/submit",
+            json={
+                "exam_type": "lesson",
+                "title": "Empty Quiz",
+                "score": 100,
+                "correct_count": 5,
+                "total_questions": 5,
+                "questions_json": {
+                    "questions": [],
+                    "answers": {}
+                }
+            }
+        )
+        assert res_submit_empty.status_code == 200
+        data_submit_empty = res_submit_empty.json()
+        assert data_submit_empty["score"] == 0
+        assert data_submit_empty["correct_count"] == 0
+        assert data_submit_empty["total_questions"] == 0
+
+        # Case C: Case insensitivity and whitespace handling (3/4 = 75%)
+        res_submit_whitespace = await ac.post(
+            "/api/v1/exams/submit",
+            json={
+                "exam_type": "lesson",
+                "title": "Whitespace and Case Test",
+                "score": 0,
+                "correct_count": 0,
+                "total_questions": 0,
+                "questions_json": {
+                    "questions": [
+                        {"id": "q1", "answer": "wohne"},
+                        {"id": "q2", "answer": "hat"},
+                        {"id": "q3", "answer": "heißen"},
+                        {"id": "q4", "answer": "kommen"}
+                    ],
+                    "answers": {
+                        "q1": "  WOHNE  ",  # correct despite whitespace and case
+                        "q2": "HAT",          # correct despite case
+                        "q3": " heißen ",    # correct despite whitespace
+                        "q4": "kam"           # incorrect
+                    }
+                }
+            }
+        )
+        assert res_submit_whitespace.status_code == 200
+        data_submit_whitespace = res_submit_whitespace.json()
+        assert data_submit_whitespace["score"] == 75
+        assert data_submit_whitespace["correct_count"] == 3
+        assert data_submit_whitespace["total_questions"] == 4
+
+        # Case D: Rounding check (2/3 = 66.666% -> 67%)
+        res_submit_round = await ac.post(
+            "/api/v1/exams/submit",
+            json={
+                "exam_type": "lesson",
+                "title": "Rounding Test",
+                "score": 0,
+                "correct_count": 0,
+                "total_questions": 0,
+                "questions_json": {
+                    "questions": [
+                        {"id": "q1", "answer": "a"},
+                        {"id": "q2", "answer": "b"},
+                        {"id": "q3", "answer": "c"}
+                    ],
+                    "answers": {
+                        "q1": "a",
+                        "q2": "b",
+                        "q3": "wrong"
+                    }
+                }
+            }
+        )
+        assert res_submit_round.status_code == 200
+        data_submit_round = res_submit_round.json()
+        assert data_submit_round["score"] == 67
+

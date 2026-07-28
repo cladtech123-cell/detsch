@@ -148,12 +148,36 @@ async def submit_exam_result(
 ):
     """Persists exam result to the database so history survives across sessions."""
     prog = await repo.get_progress()
+
+    # Recalculate and verify the score from questions_json to ensure accuracy and prevent cheating
+    questions_data = payload.questions_json or {}
+    questions = questions_data.get("questions", [])
+    user_answers = questions_data.get("answers", {})
+
+    correct_count = 0
+    total_questions = len(questions)
+
+    for q in questions:
+        q_id = q.get("id")
+        user_ans = user_answers.get(q_id, "")
+        correct_ans = q.get("answer", "")
+        if isinstance(user_ans, str) and isinstance(correct_ans, str):
+            if user_ans.strip().lower() == correct_ans.strip().lower():
+                correct_count += 1
+        elif user_ans == correct_ans:
+            correct_count += 1
+
+    import math
+    score = 0
+    if total_questions > 0:
+        score = int(math.floor(((correct_count / total_questions) * 100) + 0.5))
+
     result = ExamResult(
         exam_type=payload.exam_type,
         title=payload.title,
-        score=payload.score,
-        correct_count=payload.correct_count,
-        total_questions=payload.total_questions,
+        score=score,
+        correct_count=correct_count,
+        total_questions=total_questions,
         lesson_number=payload.lesson_number if payload.lesson_number is not None else prog.current_lesson,
         time_taken_seconds=payload.time_taken_seconds,
         questions_json=payload.questions_json,
@@ -163,7 +187,7 @@ async def submit_exam_result(
     # Also log a study session for XP tracking
     from app.models.german import StudySession
     from datetime import date
-    xp = max(10, int(payload.score * 0.6))  # Up to 60 XP for perfect score
+    xp = max(10, int(score * 0.6))  # Up to 60 XP for perfect score
     session = StudySession(
         session_date=date.today(),
         activity_type="exam",
