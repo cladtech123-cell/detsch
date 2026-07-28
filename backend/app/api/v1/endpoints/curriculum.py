@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, delete
@@ -12,6 +13,7 @@ from app.core.curriculum_seed import SEED_BOOKS, SEED_LESSONS
 from app.api.v1.endpoints.grammar import check_and_seed_grammar
 from app.services.learning_engine import IntelligentLearningEngine
 
+logger = logging.getLogger("app.api.curriculum")
 router = APIRouter()
 
 
@@ -29,7 +31,11 @@ def enrich_vocab_metadata(v: dict, lesson_number: int) -> dict:
     # 3. Part of speech
     part_of_speech = v.get("part_of_speech")
     if not part_of_speech:
-        if article or plural or german.startswith(("der ", "die ", "das ")) or (german and german[0].isupper() and not german.startswith(("Ich", "Du", "Er", "Sie", "Wir"))):
+        # Noun heuristic: must start with article/plural, or explicitly start with der/die/das,
+        # or be a single capitalized word. Sentences or phrases with multiple words are not nouns.
+        is_explicit_noun = bool(article or plural or german.lower().startswith(("der ", "die ", "das ")))
+        is_single_capitalized = bool(german and german.strip().count(" ") == 0 and german[0].isupper())
+        if is_explicit_noun or is_single_capitalized:
             part_of_speech = "noun"
         elif german.endswith(("en", "n")) and not translation.startswith(("o'sha", "bu")):
             part_of_speech = "verb"
@@ -232,6 +238,7 @@ async def list_all_lessons(repo: GermanRepository = Depends(get_german_repo)):
             grammar_topics=grammar_topics,
             user_progress=progress
         )
+        logger.info(f"Generated exercises for lesson {lesson.number}: {generated_exercises}")
 
         schema = CurriculumLessonSchema(
             id=lesson.id,
@@ -324,6 +331,7 @@ async def get_lesson(book_code: str, lesson_number: int, repo: GermanRepository 
         grammar_topics=grammar_topics,
         user_progress=progress
     )
+    logger.info(f"Generated exercises for lesson {lesson.number}: {generated_exercises}")
 
     return CurriculumLessonSchema(
         id=lesson.id,

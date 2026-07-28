@@ -86,7 +86,13 @@ export const VocabView: React.FC<VocabViewProps> = ({ vocabList, lang }) => {
     ? filteredDue 
     : (activeLessonVocab.length > 0 ? activeLessonVocab : vocabList);
 
-  const effectiveWords = finalWords;
+  const effectiveWords = studyMode === 'article'
+    ? finalWords.filter((v: any) => 
+        v.part_of_speech === 'noun' || 
+        (v.article && ['der', 'die', 'das'].includes(v.article.toLowerCase())) ||
+        ['der ', 'die ', 'das '].some(prefix => v.german.toLowerCase().startsWith(prefix))
+      )
+    : finalWords;
 
   const speak = (word: string) => {
     if ('speechSynthesis' in window) {
