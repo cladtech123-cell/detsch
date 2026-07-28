@@ -86,6 +86,13 @@ class Vocabulary(Base):
     mistake_count: Mapped[int] = mapped_column(Integer, default=0)
     review_history_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
 
+    # Metadata fields for Intelligent Learning Engine
+    part_of_speech: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    infinitive: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    lesson_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    grammar_topic: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    difficulty: Mapped[str | None] = mapped_column(String(50), nullable=True)
+
 
 class CurriculumBook(Base):
     """Stores available textbook modules (e.g. Momente A1.1, Momente A1.2)"""

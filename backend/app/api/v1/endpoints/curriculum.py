@@ -10,8 +10,70 @@ from app.models.german import CurriculumBook, CurriculumLesson, Vocabulary, Gram
 from app.schemas.german import CurriculumBookSchema, CurriculumLessonSchema
 from app.core.curriculum_seed import SEED_BOOKS, SEED_LESSONS
 from app.api.v1.endpoints.grammar import check_and_seed_grammar
+from app.services.learning_engine import IntelligentLearningEngine
 
 router = APIRouter()
+
+
+def enrich_vocab_metadata(v: dict, lesson_number: int) -> dict:
+    german = v.get("german", "")
+    translation = v.get("translation", "")
+    
+    # 1. Lesson ID
+    lesson_id = v.get("lesson_id") or v.get("lesson_number") or lesson_number
+    
+    # 2. Article & Plural
+    article = v.get("article") or None
+    plural = v.get("plural") or None
+    
+    # 3. Part of speech
+    part_of_speech = v.get("part_of_speech")
+    if not part_of_speech:
+        if article or plural or german.startswith(("der ", "die ", "das ")) or (german and german[0].isupper() and not german.startswith(("Ich", "Du", "Er", "Sie", "Wir"))):
+            part_of_speech = "noun"
+        elif german.endswith(("en", "n")) and not translation.startswith(("o'sha", "bu")):
+            part_of_speech = "verb"
+        else:
+            part_of_speech = "other"
+            
+    # 4. Infinitive
+    infinitive = v.get("infinitive")
+    if part_of_speech == "verb" and not infinitive:
+        infinitive = german.strip()
+        
+    # 5. Grammar topic
+    grammar_topic = v.get("grammar_topic")
+    if not grammar_topic:
+        if lesson_number == 1:
+            grammar_topic = "Verbkonjugation & Personalpronomen"
+        elif lesson_number == 2:
+            grammar_topic = "Possessivartikel"
+        elif lesson_number == 7:
+            grammar_topic = "Modalverben"
+        elif lesson_number == 8:
+            grammar_topic = "Wechselpräpositionen & Dativ/Akkusativ"
+        else:
+            grammar_topic = "General"
+            
+    # 6. Difficulty
+    difficulty = v.get("difficulty")
+    if not difficulty:
+        if lesson_number <= 2:
+            difficulty = "easy"
+        elif lesson_number <= 8:
+            difficulty = "medium"
+        else:
+            difficulty = "hard"
+            
+    return {
+        "part_of_speech": part_of_speech,
+        "article": article,
+        "plural": plural,
+        "infinitive": infinitive,
+        "lesson_id": lesson_id,
+        "grammar_topic": grammar_topic,
+        "difficulty": difficulty
+    }
 
 
 async def ensure_user_vocabulary_seeded(repo: GermanRepository):
@@ -22,6 +84,7 @@ async def ensure_user_vocabulary_seeded(repo: GermanRepository):
             for v in l["vocabulary_json"]:
                 existing = await repo.get_vocabulary_by_german(v["german"])
                 if not existing:
+                    meta = enrich_vocab_metadata(v, l["number"])
                     word = Vocabulary(
                         user_id=repo.user_id,
                         german=v["german"],
@@ -39,7 +102,12 @@ async def ensure_user_vocabulary_seeded(repo: GermanRepository):
                         box=1,
                         interval_days=1,
                         next_review=date.today(),
-                        times_reviewed=0
+                        times_reviewed=0,
+                        part_of_speech=meta["part_of_speech"],
+                        infinitive=meta["infinitive"],
+                        lesson_id=meta["lesson_id"],
+                        grammar_topic=meta["grammar_topic"],
+                        difficulty=meta["difficulty"]
                     )
                     repo.db.add(word)
         await repo.db.commit()
@@ -119,6 +187,9 @@ async def list_all_lessons(repo: GermanRepository = Depends(get_german_repo)):
             grammar_by_lesson[gt.lesson] = []
         grammar_by_lesson[gt.lesson].append(gt)
 
+    # Fetch progress to pass to exercise generator
+    progress = await repo.get_progress()
+
     schemas = []
     for lesson in lessons:
         vocab_list = vocab_by_lesson.get(lesson.number, [])
@@ -130,7 +201,12 @@ async def list_all_lessons(repo: GermanRepository = Depends(get_german_repo)):
                 "plural": v.plural or "",
                 "pronunciation": v.pronunciation or "",
                 "ipa": v.ipa or "",
-                "textbook_page": v.textbook_page
+                "textbook_page": v.textbook_page,
+                "part_of_speech": v.part_of_speech or "",
+                "infinitive": v.infinitive or "",
+                "lesson_id": v.lesson_id,
+                "grammar_topic": v.grammar_topic or "",
+                "difficulty": v.difficulty or ""
             }
             for v in vocab_list
         ]
@@ -148,6 +224,14 @@ async def list_all_lessons(repo: GermanRepository = Depends(get_german_repo)):
             grammar_title = lesson.grammar_title
             grammar_explanation = lesson.grammar_explanation
             grammar_examples_json = lesson.grammar_examples_json
+
+        # Dynamically generate compatible exercises
+        generated_exercises = IntelligentLearningEngine.generate_exercises(
+            lesson=lesson,
+            vocab_list=vocab_list,
+            grammar_topics=grammar_topics,
+            user_progress=progress
+        )
 
         schema = CurriculumLessonSchema(
             id=lesson.id,
@@ -168,7 +252,7 @@ async def list_all_lessons(repo: GermanRepository = Depends(get_german_repo)):
             speaking_topic=lesson.speaking_topic,
             quiz_questions_json=lesson.quiz_questions_json,
             vocabulary_json=vocab_json,
-            exercises_json=lesson.exercises_json or []
+            exercises_json=generated_exercises
         )
         schemas.append(schema)
     return schemas
@@ -202,7 +286,12 @@ async def get_lesson(book_code: str, lesson_number: int, repo: GermanRepository 
             "plural": v.plural or "",
             "pronunciation": v.pronunciation or "",
             "ipa": v.ipa or "",
-            "textbook_page": v.textbook_page
+            "textbook_page": v.textbook_page,
+            "part_of_speech": v.part_of_speech or "",
+            "infinitive": v.infinitive or "",
+            "lesson_id": v.lesson_id,
+            "grammar_topic": v.grammar_topic or "",
+            "difficulty": v.difficulty or ""
         }
         for v in vocab_list
     ]
@@ -227,6 +316,15 @@ async def get_lesson(book_code: str, lesson_number: int, repo: GermanRepository 
         grammar_explanation = lesson.grammar_explanation
         grammar_examples_json = lesson.grammar_examples_json
 
+    # Fetch user progress
+    progress = await repo.get_progress()
+    generated_exercises = IntelligentLearningEngine.generate_exercises(
+        lesson=lesson,
+        vocab_list=vocab_list,
+        grammar_topics=grammar_topics,
+        user_progress=progress
+    )
+
     return CurriculumLessonSchema(
         id=lesson.id,
         book_code=lesson.book_code,
@@ -246,7 +344,7 @@ async def get_lesson(book_code: str, lesson_number: int, repo: GermanRepository 
         speaking_topic=lesson.speaking_topic,
         quiz_questions_json=lesson.quiz_questions_json,
         vocabulary_json=vocab_json,
-        exercises_json=lesson.exercises_json or []
+        exercises_json=generated_exercises
     )
 
 
@@ -267,6 +365,7 @@ async def seed_curriculum(repo: GermanRepository = Depends(get_german_repo)):
         for v in l["vocabulary_json"]:
             existing_vocab = await repo.get_vocabulary_by_german(v["german"])
             if not existing_vocab:
+                meta = enrich_vocab_metadata(v, l["number"])
                 word = Vocabulary(
                     user_id=repo.user_id,
                     german=v["german"],
@@ -284,7 +383,12 @@ async def seed_curriculum(repo: GermanRepository = Depends(get_german_repo)):
                     box=1,
                     interval_days=1,
                     next_review=date.today(),
-                    times_reviewed=0
+                    times_reviewed=0,
+                    part_of_speech=meta["part_of_speech"],
+                    infinitive=meta["infinitive"],
+                    lesson_id=meta["lesson_id"],
+                    grammar_topic=meta["grammar_topic"],
+                    difficulty=meta["difficulty"]
                 )
                 repo.db.add(word)
         

@@ -54,6 +54,13 @@ class VocabularySchema(BaseModel):
     mistake_count: int = 0
     review_history_json: list[dict[str, Any]] = []
 
+    # Metadata fields for Intelligent Learning Engine
+    part_of_speech: str | None = None
+    infinitive: str | None = None
+    lesson_id: int | None = None
+    grammar_topic: str | None = None
+    difficulty: str | None = None
+
     class Config:
         from_attributes = True
 
