@@ -131,6 +131,7 @@ class CurriculumLesson(Base):
     # Quiz / Wortschatz definitions
     quiz_questions_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
     vocabulary_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
+    exercises_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
 
 
 class MistakeLog(Base):

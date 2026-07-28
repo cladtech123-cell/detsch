@@ -56,6 +56,11 @@ SEED_LESSONS = [
         "vocabulary_json": [
             {"german": "hallo", "translation": "salom", "article": "", "plural": "", "pronunciation": "hallo", "ipa": "ˈhalo", "textbook_page": 8},
             {"german": "heissen", "translation": "nomlanmoq, atalmoq", "article": "", "plural": "", "pronunciation": "heissen", "ipa": "ˈhaɪ̯sn̩", "textbook_page": 8}
+        ],
+        "exercises_json": [
+            {"q": "1. Wie _____ du? - Ich heiße Anna.", "opts": ["heißt", "heißen", "heiße"], "correct": 0},
+            {"q": "2. Woher _____ Max? - Er kommt aus Deutschland.", "opts": ["kommen", "kommst", "kommt"], "correct": 2},
+            {"q": "3. Ich _____ aus Österreich.", "opts": ["bin", "bist", "ist"], "correct": 0}
         ]
     },
     # Lektion 2 to 6 placeholders to satisfy curriculum range
@@ -103,6 +108,11 @@ SEED_LESSONS = [
         "vocabulary_json": [
             {"german": "die Familie", "translation": "oila", "article": "die", "plural": "Familien", "pronunciation": "Familie", "ipa": "faˈmiːli̯ə", "textbook_page": 16},
             {"german": "der Bruder", "translation": "aka, uka", "article": "der", "plural": "Brüder", "pronunciation": "Bruder", "ipa": "ˈbʁuːdɐ", "textbook_page": 16}
+        ],
+        "exercises_json": [
+            {"q": "1. Das ist _____ Vater. Er heißt Peter.", "opts": ["mein", "meine", "meinen"], "correct": 0},
+            {"q": "2. Ist das _____ Mutter?", "opts": ["dein", "deine", "deinen"], "correct": 1},
+            {"q": "3. Wie heißen _____ Geschwister?", "opts": ["deine", "dein", "deiner"], "correct": 0}
         ]
     },
     # Fill remaining to make 12 lessons in A1.1
@@ -162,6 +172,11 @@ SEED_LESSONS = [
             {"german": "die Erfahrung", "translation": "tajriba", "article": "die", "plural": "Erfahrungen", "pronunciation": "Erfahrung", "ipa": "ɛɐ̯ˈfaːʁʊŋ", "textbook_page": 56},
             {"german": "können", "translation": "qila olmoq (modal fe'l)", "article": "", "plural": "", "pronunciation": "können", "ipa": "ˈkœnən", "textbook_page": 58},
             {"german": "müssen", "translation": "majbur bo'lmoq", "article": "", "plural": "", "pronunciation": "müssen", "ipa": "ˈmʏsən", "textbook_page": 58}
+        ],
+        "exercises_json": [
+            {"q": "1. Ich _____ morgen früh aufstehen. (Majburiyat)", "opts": ["kann", "muss", "soll"], "correct": 1},
+            {"q": "2. _____ du schwimmen? (Imkoniyat)", "opts": ["Kannst", "Musst", "Sollst"], "correct": 0},
+            {"q": "3. Der Arzt sagt, ich _____ Tee trinken.", "opts": ["kann", "muss", "soll"], "correct": 2}
         ]
     },
     # Lesson 8
@@ -209,22 +224,102 @@ SEED_LESSONS = [
         "vocabulary_json": [
             {"german": "der Tisch", "translation": "stol", "article": "der", "plural": "Tische", "pronunciation": "Tisch", "ipa": "tɪʃ", "textbook_page": 62},
             {"german": "das Regal", "translation": "javon", "article": "das", "plural": "Regale", "pronunciation": "Regal", "ipa": "ʁeˈɡaːl", "textbook_page": 62}
+        ],
+        "exercises_json": [
+            {"q": "1. Ich stelle das Buch auf _____ Tisch (Akkusativ).", "opts": ["der", "den", "dem"], "correct": 1},
+            {"q": "2. Das Buch liegt auf _____ Tisch (Dativ).", "opts": ["der", "den", "dem"], "correct": 2},
+            {"q": "3. Wir gehen in _____ Schule.", "opts": ["die", "der", "das"], "correct": 0}
         ]
     }
 ]
 
+LESSON_META = {
+    3: {
+        "title_de": "Essen und Trinken",
+        "title_uz": "Yegulik va ichimliklar",
+        "description_de": "Lebensmittel, Preise und Einkaufen im Supermarkt.",
+        "description_uz": "Oziq-ovqat mahsulotlari, narxlar va do'kondagi xaridlar.",
+        "grammar_title": "Akkusativ-Objekt & Unbestimmter Artikel",
+        "grammar_explanation": "Nemis tilida o'tishli fe'llardan keyin keladigan to'ldiruvchi Akkusativ kelishigida bo'ladi. Masalan: einen Apfel, eine Banane, ein Brötchen."
+    },
+    4: {
+        "title_de": "Meine Wohnung",
+        "title_uz": "Mening xonadonim",
+        "description_de": "Möbelstücke, Zimmerbeschreibungen und Wohnungsanzeigen.",
+        "description_uz": "Mebel jihozlari, xonalarni tasvirlash va uy e'lonlari.",
+        "grammar_title": "Negationsartikel & Adjektive",
+        "grammar_explanation": "Narsalarni inkor qilish uchun 'kein/keine' ishlatiladi. Xonalarni tasvirlashda esa sifatlar qo'llaniladi (groß, klein, hell)."
+    },
+    5: {
+        "title_de": "Mein Tag",
+        "title_uz": "Mening kunim",
+        "description_de": "Tagesablauf, Uhrzeiten und Wochentage.",
+        "description_uz": "Kun tartibi, soatlar va haftaning kunlari haqida suhbat.",
+        "grammar_title": "Trennbare Verben & Temporale Präpositionen",
+        "grammar_explanation": "Ajraladigan fe'llar (trennbare Verben) gapda ajralib, old qo'shimchasi gap oxiriga boradi. Masalan: aufstehen (Ich stehe auf)."
+    },
+    6: {
+        "title_de": "Freizeit und Hobbys",
+        "title_uz": "Bo'sh vaqt va sevimli mashg'ulotlar",
+        "description_de": "Freizeitaktivitäten, Hobbys und Verabredungen.",
+        "description_uz": "Bo'sh vaqtdagi faoliyatlar, sevimli mashg'ulotlar va uchrashuvlar.",
+        "grammar_title": "Verbkonjugation mit Vokalwechsel",
+        "grammar_explanation": "Ba'zi kuchli fe'llar hozirgi zamonda turlanganda o'zak unlisi o'zgaradi (e -> i/ie, a -> ä). Masalan: lesen (du liest), fahren (er fährt)."
+    },
+    9: {
+        "title_de": "Reisen und Mobilität",
+        "title_uz": "Sayohat va transport",
+        "description_de": "Verkehrsmittel, Wegbeschreibungen und Urlaubsziele.",
+        "description_uz": "Transport vositalari, yo'nalishlarni tushuntirish va sayohat joylari.",
+        "grammar_title": "Lokale Präpositionen & Imperativ",
+        "grammar_explanation": "Yo'nalish va joylashuvni ko'rsatish uchun predloglar (mit dem Zug, zum Bahnhof) va buyruq mayli (Imperativ) ishlatiladi."
+    },
+    10: {
+        "title_de": "Gesundheit und Körper",
+        "title_uz": "Salomatlik va tana a'zolari",
+        "description_de": "Körperteile, Krankheiten und Arztbesuche.",
+        "description_uz": "Tana a'zolari, kasalliklar va shifokor qabulida bo'lish.",
+        "grammar_title": "Possessivartikel im Dativ & Imperativ",
+        "grammar_explanation": "Kasal bo'lganda shifokor maslahatlari va tana a'zolari egalik olmoshlari bilan Dativ kelishigida aytiladi."
+    },
+    11: {
+        "title_de": "Kleidung und Wetter",
+        "title_uz": "Kiyimlar va ob-havo",
+        "description_de": "Kleidung einkaufen und über das Wetter sprechen.",
+        "description_uz": "Kiyim-kechak sotib olish va ob-havo haqida gapirish.",
+        "grammar_title": "Demonstrativpronomen & Komparativ",
+        "grammar_explanation": "Ko'rsatish olmoshlari (dieser, dieses) va sifatlarning qiyosiy darajalari (gut - besser, gern - lieber) ishlatiladi."
+    },
+    12: {
+        "title_de": "Feste und Feiern",
+        "title_uz": "Bayramlar va tantanalar",
+        "description_de": "Geburtstage, Feiertage und Geschenke.",
+        "description_uz": "Tug'ilgan kunlar, bayramlar va sovg'alar haqida suhbat.",
+        "grammar_title": "Dativ-Objekt & Personalpronomen im Dativ",
+        "grammar_explanation": "Kimgadir sovg'a berish yoki bayram tilashda Dativ kelishigi ishlatiladi. Masalan: Ich schenke ihm ein Buch."
+    }
+}
+
 # Generate simple lessons up to 12 to ensure DB has full course structure
 for num in range(3, 13):
     if num not in [7, 8]:
+        meta = LESSON_META.get(num, {
+            "title_de": f"Lektion {num}",
+            "title_uz": f"{num}-dars",
+            "description_de": f"Inhalt der Lektion {num}",
+            "description_uz": f"{num}-dars mazmuni",
+            "grammar_title": "Grammatik",
+            "grammar_explanation": "Grammatik qoidalar."
+        })
         SEED_LESSONS.append({
             "book_code": "A1.1",
             "number": num,
-            "title_de": f"Lektion {num} der Momente A1.1",
-            "title_uz": f"Momente A1.1 darsligining {num}-darsi",
-            "description_de": f"Inhalte und Themen für Lektion {num}.",
-            "description_uz": f"{num}-dars bo'yicha grammatik qoidalar va mashqlar.",
-            "grammar_title": "Fortgeschrittene Grammatik",
-            "grammar_explanation": f"Lektion {num} bo'yicha grammatika qoidalari.",
+            "title_de": meta["title_de"],
+            "title_uz": meta["title_uz"],
+            "description_de": meta["description_de"],
+            "description_uz": meta["description_uz"],
+            "grammar_title": meta["grammar_title"],
+            "grammar_explanation": meta["grammar_explanation"],
             "grammar_examples_json": [],
             "listening_dialogue": "A: Hallo!\nB: Tag!",
             "listening_quiz_json": [],
@@ -233,5 +328,9 @@ for num in range(3, 13):
             "writing_prompt": "Schreiben Sie einen kurzen Text.",
             "speaking_topic": "Sprechen Sie über das Thema.",
             "quiz_questions_json": [],
-            "vocabulary_json": []
+            "vocabulary_json": [],
+            "exercises_json": [
+                {"q": f"1. Bu {num}-darsning 1-mashqi. Nemis tilida to'g'ri so'zni toping.", "opts": ["Ausgezeichnet", "Sehr gut", "Gut"], "correct": 0},
+                {"q": f"2. Bu {num}-darsning 2-mashqi. To'g'ri fe'l shaklini tanlang.", "opts": ["spreche", "sprichst", "spricht"], "correct": 2}
+            ]
         })

@@ -697,31 +697,31 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
                   Lektion {lessonData.number} grammatikasini mustahkamlash uchun quyidagi test jumlalarini to'ldiring:
                 </p>
                 
-                {[
-                  { q: "1. Ich _____ morgen früh aufstehen. (Majburiyat)", opts: ["kann", "muss", "soll"], correct: 1 },
-                  { q: "2. _____ du schwimmen? (Imkoniyat)", opts: ["Kannst", "Musst", "Sollst"], correct: 0 },
-                  { q: "3. Der Arzt sagt, ich _____ Tee trinken.", opts: ["kann", "muss", "soll"], correct: 2 }
-                ].map((item, idx) => (
-                  <div key={idx} className="p-4 bg-surface border border-border rounded-xl space-y-3">
-                    <p className="font-bold">{item.q}</p>
-                    <div className="flex gap-2">
-                      {item.opts.map((opt, oIdx) => (
-                        <button
-                          key={oIdx}
-                          onClick={() => {
-                            alert(oIdx === item.correct ? "To'g'ri!" : "Xato");
-                            if (oIdx === item.correct) {
-                              setExerciseAnswers({ ...exerciseAnswers, [idx]: oIdx });
-                            }
-                          }}
-                          className="px-4 py-1.5 border border-border rounded bg-surface-variant hover:bg-primary/20 transition text-xs"
-                        >
-                          {opt}
-                        </button>
-                      ))}
+                {lessonData.exercises_json && lessonData.exercises_json.length > 0 ? (
+                  lessonData.exercises_json.map((item: any, idx: number) => (
+                    <div key={idx} className="p-4 bg-surface border border-border rounded-xl space-y-3">
+                      <p className="font-bold">{item.q}</p>
+                      <div className="flex gap-2">
+                        {item.opts.map((opt: string, oIdx: number) => (
+                          <button
+                            key={oIdx}
+                            onClick={() => {
+                              alert(oIdx === item.correct ? "To'g'ri!" : "Xato");
+                              if (oIdx === item.correct) {
+                                setExerciseAnswers({ ...exerciseAnswers, [idx]: oIdx });
+                              }
+                            }}
+                            className="px-4 py-1.5 border border-border rounded bg-surface-variant hover:bg-primary/20 transition text-xs"
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-xs text-on-surface-variant">Ushbu dars uchun mashqlar yuklanmadi.</p>
+                )}
               </div>
             </div>
           )}

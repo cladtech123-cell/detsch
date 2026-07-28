@@ -87,6 +87,7 @@ class CurriculumLessonSchema(BaseModel):
     speaking_topic: str
     quiz_questions_json: list[dict[str, Any]]
     vocabulary_json: list[dict[str, Any]]
+    exercises_json: list[dict[str, Any]] = []
 
     class Config:
         from_attributes = True
