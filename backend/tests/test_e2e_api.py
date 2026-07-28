@@ -310,3 +310,57 @@ async def test_e2e_all_endpoints() -> None:
         assert res_submit_incomplete.status_code == 400
         assert "integrity" in res_submit_incomplete.json()["detail"].lower()
 
+
+def test_exam_question_validation() -> None:
+    from app.api.v1.endpoints.exams import validate_and_clean_questions
+    
+    # 1. Valid question
+    valid_qs = [
+        {
+            "id": "q1",
+            "question": "Ich __________ (wohnen) in Berlin.",
+            "answer": "wohne",
+            "hint": "Conjugate wohnen for ich"
+        }
+    ]
+    assert validate_and_clean_questions(valid_qs) == valid_qs
+
+    # 2. Invalid blank position
+    invalid_blank = [
+        {
+            "id": "q1",
+            "question": "Ich wohne in Berlin.",
+            "answer": "wohne",
+            "hint": "Conjugate wohnen for ich"
+        }
+    ]
+    with pytest.raises(ValueError, match="Question must contain a blank placeholder"):
+        validate_and_clean_questions(invalid_blank)
+
+    # 3. Multiple words answer key
+    multi_words = [
+        {
+            "id": "q1",
+            "question": "Ich __________ in Berlin.",
+            "answer": "wohne dort",
+            "hint": "Translate"
+        }
+    ]
+    with pytest.raises(ValueError, match="Answer must be a single word"):
+        validate_and_clean_questions(multi_words)
+
+    # 4. Option consistency check
+    invalid_options = [
+        {
+            "id": "q1",
+            "question": "Ich __________ (wohnen) in Berlin.",
+            "answer": "wohne",
+            "hint": "Conjugate wohnen for ich",
+            "options": ["wohnst", "wohnt"]
+        }
+    ]
+    with pytest.raises(ValueError, match="Expected answer must be one of the options"):
+        validate_and_clean_questions(invalid_options)
+
+
+

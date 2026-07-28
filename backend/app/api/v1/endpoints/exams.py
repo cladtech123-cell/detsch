@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import re
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,6 +16,45 @@ from app.schemas.german import ExamResultCreate, ExamResultSchema
 from app.services.ai import get_ai_provider
 
 router = APIRouter()
+
+
+def validate_and_clean_questions(questions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    validated_questions = []
+    for q in questions:
+        if not isinstance(q, dict):
+            raise ValueError("Question must be a dictionary")
+        
+        q_id = q.get("id")
+        question_text = q.get("question")
+        hint = q.get("hint")
+        answer = q.get("answer")
+        options = q.get("options", [])
+        
+        if not q_id or not question_text or not answer:
+            raise ValueError("Missing required fields in question")
+            
+        answer = str(answer).strip()
+        question_text = str(question_text).strip()
+        
+        # 1. Blank placeholder validation
+        blank_match = re.search(r'_{3,}', question_text)
+        if not blank_match:
+            raise ValueError("Question must contain a blank placeholder like '___'")
+            
+        # 2. Answer format: blank never requires multiple words
+        if len(answer.split()) > 1:
+            raise ValueError("Answer must be a single word")
+            
+        # 3. Question consistency: if options are present, answer must be in options
+        if options:
+            cleaned_opts = [str(o).strip().lower() for o in options]
+            if answer.lower() not in cleaned_opts:
+                raise ValueError("Expected answer must be one of the options")
+        
+        validated_questions.append(q)
+    return validated_questions
+
+
 
 
 def generate_exam_signature(questions: list[dict[str, Any]]) -> str:
@@ -62,13 +102,13 @@ async def generate_exam(
         prompt = (
             f"Generate a customized German practice test targeting these common mistakes the student makes:\n"
             f"{mistakes_str}\n\n"
-            f"Generate 5 fill-in-the-blank or correction questions. Return the questions in JSON format with the fields:\n"
+            f"Generate 5 fill-in-the-blank questions (each question MUST contain a blank represented by '_____'). Return the questions in JSON format with the fields:\n"
             f"- 'title': Title of the practice test.\n"
             f"- 'questions': list of objects, each with:\n"
             f"    * 'id': e.g., 'q1', 'q2'\n"
-            f"    * 'question': the question prompt (German, with Uzbek instructions if needed)\n"
+            f"    * 'question': the question prompt (German, with Uzbek instructions if needed, containing a blank represented by '_____')\n"
             f"    * 'hint': a hint explaining the rule (in Uzbek/English)\n"
-            f"    * 'answer': the correct answer expected\n"
+            f"    * 'answer': the correct single-word answer expected\n"
             f"Return ONLY the valid, parsable JSON. No markdown tags."
         )
     elif exam_type == "cefr":
@@ -112,14 +152,24 @@ async def generate_exam(
         )
 
     try:
+        system_instruction = (
+            "You are a strict, helpful German exam designer. Output JSON only.\n"
+            "CRITICAL RULES for Fill-in-the-Blank questions:\n"
+            "1. Every sentence must be grammatically correct German.\n"
+            "2. Fill-in-the-blank questions must contain exactly one blank represented by at least 3 underscores (e.g., '_____').\n"
+            "3. The expected answer key must be a single word (no spaces, no multiple words) and must fit the blank perfectly to form a grammatically correct sentence.\n"
+            "4. Verbs (including modal verbs like können, müssen, sollen, wollen, dürfen, mögen) must be conjugated correctly according to the subject pronoun (ich, du, er/sie/es, wir, ihr, sie/Sie) in the sentence.\n"
+            "5. The expected answer must not be included in the question text instead of the blank."
+        )
         res = await ai.generate_content(
             prompt=prompt,
-            system_instruction="You are a strict, helpful German exam designer. Output JSON only.",
+            system_instruction=system_instruction,
             json_mode=True
         )
         quiz_data = json.loads(res)
         if not isinstance(quiz_data, dict) or "questions" not in quiz_data:
             raise ValueError("Invalid quiz structure")
+        quiz_data["questions"] = validate_and_clean_questions(quiz_data["questions"])
     except Exception:
         quiz_data = {
             "title": f"{lesson_name} Fallback Quiz",
