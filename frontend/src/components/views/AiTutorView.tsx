@@ -61,15 +61,28 @@ export const AiTutorView: React.FC<AiTutorViewProps> = ({ lang, onAddXp }) => {
   // Chat mutation
   const chatMutation = useMutation({
     mutationFn: apiService.sendTutorMessage,
-    onSuccess: (newReply) => {
+    onSuccess: async (newReply) => {
+      // Keep the tutor reply working normally
       queryClient.invalidateQueries({ queryKey: ['tutor-messages'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['activity'] });
       setInput('');
       if (speechEnabled) {
         speakText(newReply.content);
       }
-      onAddXp(15);
+
+      try {
+        await apiService.logStudySession({
+          activity_type: 'ai_tutor',
+          xp_earned: 15,
+          duration_minutes: 2,
+        });
+        
+        onAddXp(15);
+        queryClient.invalidateQueries({ queryKey: ['progress'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['activity'] });
+      } catch (err) {
+        console.error("Failed to log tutor session:", err);
+      }
     },
   });
 

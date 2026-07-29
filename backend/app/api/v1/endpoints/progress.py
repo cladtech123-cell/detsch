@@ -22,6 +22,7 @@ DAY_ABBRS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 @router.get("/progress", response_model=UserProgressSchema, summary="Get user progress metrics")
 async def get_progress(repo: GermanRepository = Depends(get_german_repo)):
     progress = await repo.get_progress()
+    progress.total_xp = await repo.get_total_xp()
     return UserProgressSchema.from_orm(progress)
 
 
@@ -45,6 +46,7 @@ async def update_progress(
         progress.current_lesson = current_lesson
     if reading is not None:
         progress.reading_level = reading
+        progress.target_level = reading
     if writing is not None:
         progress.writing_level = writing
     if listening is not None:
@@ -63,6 +65,7 @@ async def update_progress(
         progress.ai_model = ai_model
 
     updated = await repo.update_progress(progress)
+    updated.total_xp = await repo.get_total_xp()
     return UserProgressSchema.from_orm(updated)
 
 
@@ -128,6 +131,10 @@ async def complete_lesson_section(
         lesson_progress_dict[lesson_key] = {}
 
     sections = dict(lesson_progress_dict[lesson_key])
+    if sections.get(section_name) is True:
+        progress.total_xp = await repo.get_total_xp()
+        return UserProgressSchema.from_orm(progress)
+
     sections[section_name] = True
     lesson_progress_dict[lesson_key] = sections
     progress.lesson_progress = lesson_progress_dict
@@ -139,6 +146,9 @@ async def complete_lesson_section(
         if lesson_number not in completed_lessons_list:
             completed_lessons_list.append(lesson_number)
             progress.completed_lessons = completed_lessons_list
+        if lesson_number == progress.current_lesson:
+            progress.current_lesson = lesson_number + 1
 
     updated = await repo.update_progress(progress)
+    updated.total_xp = await repo.get_total_xp()
     return UserProgressSchema.from_orm(updated)

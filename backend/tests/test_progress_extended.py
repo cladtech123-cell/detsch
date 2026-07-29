@@ -74,6 +74,36 @@ async def test_extended_progress_tracking() -> None:
         res_get_b = await ac.get("/api/v1/progress")
         assert "hoeren" not in res_get_b.json()["lesson_progress"]["7"]
 
+        # Check total_xp is present in progress response (defaults to 0 initially)
+        assert res_get_b.json()["total_xp"] == 0
+
+        # Log a study session for User B (earning 30 XP)
+        log_res = await ac.post("/api/v1/progress/log-session", json={
+            "activity_type": "lesson",
+            "xp_earned": 30,
+            "duration_minutes": 5,
+            "lesson_number": 7
+        })
+        assert log_res.status_code == 200
+        
+        # Check total_xp is now 30
+        res_get_b2 = await ac.get("/api/v1/progress")
+        assert res_get_b2.json()["total_xp"] == 30
+
+        # Test duplicate completion of "einstieg" section for User B (which is default seeded)
+        dup_res = await ac.post("/api/v1/progress/lesson/section?lesson_number=7&section_name=einstieg")
+        assert dup_res.status_code == 200
+
+        # Test lesson auto-advancement when completing all remaining sections of Lektion 7 for User B.
+        sections_to_complete = ["hoeren", "lesen", "schreiben", "sprechen", "quiz", "uebungen", "wiederholung"]
+        for sec in sections_to_complete:
+            sec_res = await ac.post(f"/api/v1/progress/lesson/section?lesson_number=7&section_name={sec}")
+            assert sec_res.status_code == 200
+        
+        # User B completed all 10 sections of Lektion 7, current_lesson should auto-advance to 8
+        final_prog_b = await ac.get("/api/v1/progress")
+        assert final_prog_b.json()["current_lesson"] == 8
+
         # --- Test independent grammar completions ---
         # Fetch topics for User A
         ac.headers["Authorization"] = f"Bearer {token_a}"

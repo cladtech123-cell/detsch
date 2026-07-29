@@ -25,6 +25,7 @@ class UserProgressSchema(BaseModel):
     completed_lessons: list[int] = []
     lesson_progress: dict[str, dict[str, bool]] = {}
     completed_grammar_topics: list[int] = []
+    total_xp: int = 0
 
     class Config:
         from_attributes = True

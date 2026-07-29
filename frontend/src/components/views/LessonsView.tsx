@@ -120,7 +120,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
     }
   }, [progress, selectedLessonNumber]);
 
-  const markComplete = async (tab: TabMode) => {
+  const markComplete = async (tab: TabMode, skipXpLog = false) => {
+    if (completions[tab]) return;
+
     const updated = { ...completions, [tab]: true };
     setCompletions(updated);
 
@@ -129,17 +131,19 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
     const progressPercent = Math.round((completedCount / 10) * 100);
 
     // Log study session XP for this completed section
-    try {
-      await apiService.logStudySession({
-        activity_type: 'lesson',
-        xp_earned: 30, // 30 XP per section
-        duration_minutes: 5,
-        lesson_number: selectedLessonNumber,
-      });
-      onAddXp(30);
-      queryClient.invalidateQueries({ queryKey: ['activity'] });
-    } catch {
-      // Non-critical if session logging fails
+    if (!skipXpLog) {
+      try {
+        await apiService.logStudySession({
+          activity_type: 'lesson',
+          xp_earned: 30, // 30 XP per section
+          duration_minutes: 5,
+          lesson_number: selectedLessonNumber,
+        });
+        onAddXp(30);
+        queryClient.invalidateQueries({ queryKey: ['activity'] });
+      } catch {
+        // Non-critical if session logging fails
+      }
     }
 
     // Save section completion to backend database
@@ -151,18 +155,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
       console.error("Failed to sync completion status to database:", err);
     }
 
-    // If 100% completed, auto-advance backend lesson level
+    // If 100% completed, auto-advance backend lesson level (handled on backend completeLessonSection)
     if (progressPercent === 100 && selectedLessonNumber === currentLessonNumber) {
-      try {
-        await apiService.updateProgress({
-          current_lesson: currentLessonNumber + 1,
-        });
-        queryClient.invalidateQueries({ queryKey: ['progress'] });
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        alert(lang === 'uz' ? "Tabriklaymiz! Lektion to'liq yakunlandi va keyingi dars ochildi!" : "Lektion abgeschlossen!");
-      } catch (err) {
-        console.error(err);
-      }
+      alert(lang === 'uz' ? "Tabriklaymiz! Lektion to'liq yakunlandi va keyingi dars ochildi!" : "Lektion abgeschlossen!");
     }
   };
 
@@ -236,7 +231,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
     }, 2000);
   };
 
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     if (!lessonData?.quiz_questions_json) return;
     let correct = 0;
     lessonData.quiz_questions_json.forEach((q: any, idx: number) => {
@@ -248,8 +243,20 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
     setQuizScore(percentage);
     setQuizSubmitted(true);
     if (percentage >= 60) {
-      onAddXp(45);
-      markComplete('quiz');
+      if (!completions['quiz']) {
+        try {
+          await apiService.logStudySession({
+            activity_type: 'quiz_pass',
+            xp_earned: 45,
+            duration_minutes: 5,
+            lesson_number: selectedLessonNumber,
+          });
+        } catch {
+          // non-critical
+        }
+        onAddXp(45);
+      }
+      markComplete('quiz', true);
     }
   };
 

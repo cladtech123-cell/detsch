@@ -256,6 +256,14 @@ class GermanRepository:
         )
         return result.scalar() or 0
 
+    async def get_total_xp(self) -> int:
+        """Returns the total XP earned by the user across all sessions."""
+        result = await self.db.execute(
+            select(func.sum(StudySession.xp_earned))
+            .filter(StudySession.user_id == self.user_id)
+        )
+        return result.scalar() or 0
+
     # --- ExamResult ---
     async def save_exam_result(self, exam_result: ExamResult) -> ExamResult:
         exam_result.user_id = self.user_id
