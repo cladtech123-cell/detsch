@@ -19,11 +19,22 @@ router = APIRouter()
 DAY_ABBRS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 
+def normalize_progress(progress: UserProgress) -> UserProgress:
+    """Ensure completed_lessons, lesson_progress, and completed_grammar_topics are not None."""
+    if progress.completed_lessons is None:
+        progress.completed_lessons = []
+    if progress.lesson_progress is None:
+        progress.lesson_progress = {}
+    if progress.completed_grammar_topics is None:
+        progress.completed_grammar_topics = []
+    return progress
+
+
 @router.get("/progress", response_model=UserProgressSchema, summary="Get user progress metrics")
 async def get_progress(repo: GermanRepository = Depends(get_german_repo)):
     progress = await repo.get_progress()
     progress.total_xp = await repo.get_total_xp()
-    return UserProgressSchema.from_orm(progress)
+    return UserProgressSchema.from_orm(normalize_progress(progress))
 
 
 @router.post("/progress/update", response_model=UserProgressSchema, summary="Update CEFR levels or course settings")
@@ -66,7 +77,7 @@ async def update_progress(
 
     updated = await repo.update_progress(progress)
     updated.total_xp = await repo.get_total_xp()
-    return UserProgressSchema.from_orm(updated)
+    return UserProgressSchema.from_orm(normalize_progress(updated))
 
 
 @router.post("/progress/log-session", response_model=StudySessionSchema, summary="Log a study session (XP + activity)")
@@ -133,7 +144,7 @@ async def complete_lesson_section(
     sections = dict(lesson_progress_dict[lesson_key])
     if sections.get(section_name) is True:
         progress.total_xp = await repo.get_total_xp()
-        return UserProgressSchema.from_orm(progress)
+        return UserProgressSchema.from_orm(normalize_progress(progress))
 
     sections[section_name] = True
     lesson_progress_dict[lesson_key] = sections
@@ -151,4 +162,4 @@ async def complete_lesson_section(
 
     updated = await repo.update_progress(progress)
     updated.total_xp = await repo.get_total_xp()
-    return UserProgressSchema.from_orm(updated)
+    return UserProgressSchema.from_orm(normalize_progress(updated))

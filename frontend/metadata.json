@@ -1,0 +1,6 @@
+{
+  "name": "DeutschMastery",
+  "description": "O'quvchi Boshqaruvi - Nemis tili mahoratini oshirish interaktiv platformasi",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

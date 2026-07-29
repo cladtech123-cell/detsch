@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class UserProgressSchema(BaseModel):
@@ -26,6 +26,16 @@ class UserProgressSchema(BaseModel):
     lesson_progress: dict[str, dict[str, bool]] = {}
     completed_grammar_topics: list[int] = []
     total_xp: int = 0
+
+    @field_validator("completed_lessons", "completed_grammar_topics", mode="before")
+    @classmethod
+    def coerce_list(cls, v: Any) -> Any:
+        return v if v is not None else []
+
+    @field_validator("lesson_progress", mode="before")
+    @classmethod
+    def coerce_dict(cls, v: Any) -> Any:
+        return v if v is not None else {}
 
     class Config:
         from_attributes = True

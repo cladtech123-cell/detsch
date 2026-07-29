@@ -47,13 +47,35 @@ class GermanRepository:
             self.db.add(progress)
             await self.db.commit()
             await self.db.refresh(progress)
+
+        if progress.completed_lessons is None:
+            progress.completed_lessons = []
+        if progress.lesson_progress is None:
+            progress.lesson_progress = {}
+        if progress.completed_grammar_topics is None:
+            progress.completed_grammar_topics = []
+
         return progress
 
     async def update_progress(self, progress: UserProgress) -> UserProgress:
         progress.user_id = self.user_id
+        if progress.completed_lessons is None:
+            progress.completed_lessons = []
+        if progress.lesson_progress is None:
+            progress.lesson_progress = {}
+        if progress.completed_grammar_topics is None:
+            progress.completed_grammar_topics = []
         self.db.add(progress)
         await self.db.commit()
         await self.db.refresh(progress)
+        
+        if progress.completed_lessons is None:
+            progress.completed_lessons = []
+        if progress.lesson_progress is None:
+            progress.lesson_progress = {}
+        if progress.completed_grammar_topics is None:
+            progress.completed_grammar_topics = []
+            
         return progress
 
     # --- Vocabulary ---
