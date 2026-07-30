@@ -179,6 +179,13 @@ export const VocabView: React.FC<VocabViewProps> = ({ vocabList, lang }) => {
   const reviewMutation = useMutation({
     mutationFn: (data: { word_id: number; is_correct: boolean }) =>
       apiService.submitVocabReview(data.word_id, data.is_correct),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['progress'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['activity'] });
+      queryClient.invalidateQueries({ queryKey: ['vocabulary-due'] });
+      queryClient.invalidateQueries({ queryKey: ['vocabulary-all'] });
+    }
   });
 
   const initGameQuestion = (idx: number) => {

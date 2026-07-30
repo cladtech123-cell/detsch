@@ -63,3 +63,84 @@ async def test_german_repository_operations() -> None:
         assert mistakes[0].incorrect_text == "Ich wohnen"
 
     await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_study_streak_updates() -> None:
+    from datetime import date, timedelta
+    from app.models.german import StudySession
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", future=True)
+    async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with async_session() as session:
+        repo = GermanRepository(session, user_id=1)
+
+        # 1. Initially streak should be 0
+        progress = await repo.get_progress()
+        assert progress.study_streak == 0
+        assert progress.last_study_date is None
+
+        # 2. Log first study session today -> streak becomes 1
+        session1 = StudySession(
+            session_date=date.today(),
+            activity_type="ai_tutor",
+            xp_earned=15,
+            duration_minutes=2,
+        )
+        await repo.log_study_session(session1)
+        
+        progress = await repo.get_progress()
+        assert progress.study_streak == 1
+        assert progress.last_study_date == date.today()
+
+        # 3. Log another session today -> streak remains 1
+        session2 = StudySession(
+            session_date=date.today(),
+            activity_type="vocab",
+            xp_earned=10,
+            duration_minutes=1,
+        )
+        await repo.log_study_session(session2)
+        
+        progress = await repo.get_progress()
+        assert progress.study_streak == 1
+
+        # 4. Simulate consecutive day (mock last_study_date to yesterday)
+        progress.last_study_date = date.today() - timedelta(days=1)
+        repo.db.add(progress)
+        await repo.db.commit()
+
+        session3 = StudySession(
+            session_date=date.today(),
+            activity_type="exam",
+            xp_earned=60,
+            duration_minutes=5,
+        )
+        await repo.log_study_session(session3)
+        
+        progress = await repo.get_progress()
+        assert progress.study_streak == 2
+        assert progress.last_study_date == date.today()
+
+        # 5. Simulate gap in study (mock last_study_date to 3 days ago)
+        progress.last_study_date = date.today() - timedelta(days=3)
+        repo.db.add(progress)
+        await repo.db.commit()
+
+        session4 = StudySession(
+            session_date=date.today(),
+            activity_type="lesson",
+            xp_earned=30,
+            duration_minutes=5,
+        )
+        await repo.log_study_session(session4)
+        
+        progress = await repo.get_progress()
+        assert progress.study_streak == 1
+        assert progress.last_study_date == date.today()
+
+    await engine.dispose()

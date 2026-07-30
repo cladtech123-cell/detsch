@@ -69,20 +69,10 @@ export const AiTutorView: React.FC<AiTutorViewProps> = ({ lang, onAddXp }) => {
         speakText(newReply.content);
       }
 
-      try {
-        await apiService.logStudySession({
-          activity_type: 'ai_tutor',
-          xp_earned: 15,
-          duration_minutes: 2,
-        });
-        
-        onAddXp(15);
-        queryClient.invalidateQueries({ queryKey: ['progress'] });
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        queryClient.invalidateQueries({ queryKey: ['activity'] });
-      } catch (err) {
-        console.error("Failed to log tutor session:", err);
-      }
+      onAddXp(15);
+      queryClient.invalidateQueries({ queryKey: ['progress'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['activity'] });
     },
   });
 

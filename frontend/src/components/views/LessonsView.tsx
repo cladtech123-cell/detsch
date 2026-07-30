@@ -139,21 +139,23 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ lang, onAddXp }) => {
           duration_minutes: 5,
           lesson_number: selectedLessonNumber,
         });
-        onAddXp(30);
-        queryClient.invalidateQueries({ queryKey: ['activity'] });
-      } catch {
-        // Non-critical if session logging fails
+      } catch (err) {
+        console.error("Failed to log study session:", err);
       }
     }
 
     // Save section completion to backend database
     try {
       await apiService.completeLessonSection(selectedLessonNumber, tab);
-      queryClient.invalidateQueries({ queryKey: ['progress'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (err) {
       console.error("Failed to sync completion status to database:", err);
     }
+
+    // Invalidate queries after both database updates have completed
+    onAddXp(30);
+    queryClient.invalidateQueries({ queryKey: ['activity'] });
+    queryClient.invalidateQueries({ queryKey: ['progress'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
 
     // If 100% completed, auto-advance backend lesson level (handled on backend completeLessonSection)
     if (progressPercent === 100 && selectedLessonNumber === currentLessonNumber) {

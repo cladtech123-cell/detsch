@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "backend/app/api/v1/endpoints/progress.py": {
-    "mtime": 1785386253.505617,
-    "ast_hash": "4fe5b36739a7949c216c1a18832905fc",
+    "mtime": 1785156057.705606,
+    "ast_hash": "e58e3a12c629a330780fdc7a7d984086",
     "semantic_hash": ""
   },
   "backend/app/api/v1/endpoints/reports.py": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "backend/app/repositories/german.py": {
-    "mtime": 1785386250.8157358,
-    "ast_hash": "4a75a7335f78858b353f79cb4e5c0c84",
+    "mtime": 1785156178.4555256,
+    "ast_hash": "8374ecfa1dc0f43f107c670b373b4fac",
     "semantic_hash": ""
   },
   "backend/app/schemas/__init__.py": {
@@ -225,8 +225,8 @@
     "semantic_hash": ""
   },
   "backend/app/schemas/german.py": {
-    "mtime": 1785301165.1423683,
-    "ast_hash": "1ea385b2285bfcb794d29798099a7773",
+    "mtime": 1785212411.59113,
+    "ast_hash": "217a37f1c991bc1e9b7fef3e40c68039",
     "semantic_hash": ""
   },
   "backend/app/services/__init__.py": {
@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "backend/tests/test_progress_extended.py": {
-    "mtime": 1785217481.8185208,
-    "ast_hash": "de25964dfdbc1a3fda96390423aa6c40",
+    "mtime": 1785156233.8540037,
+    "ast_hash": "30eb9900ebb2bc9ddd26b0304d53c026",
     "semantic_hash": ""
   },
   "backend/tests/test_providers.py": {
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "backend/tests/test_repository.py": {
-    "mtime": 1785386257.293126,
-    "ast_hash": "1ba7e7277246ba7f835ec22038665fd6",
+    "mtime": 1784966231.9243157,
+    "ast_hash": "bc5dff6493aadb3b0664dc4e30d03b05",
     "semantic_hash": ""
   },
   "backend/tests/test_service.py": {
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
-    "mtime": 1785386281.9774933,
-    "ast_hash": "460cf58206763facea149acc585aac20",
+    "mtime": 1785150175.7707412,
+    "ast_hash": "77e2e269fc1307aecb92dc05cf393d30",
     "semantic_hash": ""
   },
   "frontend/src/components/FloatingActionButton.tsx": {
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   "frontend/src/components/views/AiTutorView.tsx": {
-    "mtime": 1785386267.5705626,
-    "ast_hash": "90d53b4fc131d666c82f6c6ffe57a287",
+    "mtime": 1785139800.2651756,
+    "ast_hash": "dee1180638ef4fb267a53e6be8e6460b",
     "semantic_hash": ""
   },
   "frontend/src/components/views/DashboardView.tsx": {
@@ -530,8 +530,8 @@
     "semantic_hash": ""
   },
   "frontend/src/components/views/ExamsView.tsx": {
-    "mtime": 1785386517.189354,
-    "ast_hash": "b0a308453db3c18f544dfe6a5846b5fb",
+    "mtime": 1785139632.1656818,
+    "ast_hash": "dfcdf03547dc90fd22bcbf500fe0bb9e",
     "semantic_hash": ""
   },
   "frontend/src/components/views/GrammarView.tsx": {
@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "frontend/src/components/views/LessonsView.tsx": {
-    "mtime": 1785386276.8197408,
-    "ast_hash": "8e2c156e6968b5301eb54dbf579a3f4b",
+    "mtime": 1785156692.3653793,
+    "ast_hash": "2d33dfa38548f58832708e0d28f648c3",
     "semantic_hash": ""
   },
   "frontend/src/components/views/OcrView.tsx": {
@@ -560,8 +560,8 @@
     "semantic_hash": ""
   },
   "frontend/src/components/views/VocabView.tsx": {
-    "mtime": 1785386273.4393222,
-    "ast_hash": "a671faf52f970de430e84fe7aad56703",
+    "mtime": 1785214624.2326236,
+    "ast_hash": "68cecef1c66e964dc4ab2b0afa949786",
     "semantic_hash": ""
   },
   "frontend/src/data/i18n.ts": {
@@ -722,11 +722,6 @@
   "backend/tests/test_learning_engine.py": {
     "mtime": 1785212466.894346,
     "ast_hash": "b6612e3cffb8926a0b5c265b91dbf123",
-    "semantic_hash": ""
-  },
-  "backend/tests/test_legacy_progress.py": {
-    "mtime": 1785301185.9354281,
-    "ast_hash": "637a255ff720129c7494cce2a28cf7d6",
     "semantic_hash": ""
   }
 }

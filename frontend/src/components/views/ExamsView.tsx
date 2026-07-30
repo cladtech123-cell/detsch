@@ -65,8 +65,10 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ lang, onAddXp }) => {
   const submitMutation = useMutation({
     mutationFn: (data: any) => apiService.submitExamResult(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['exam-history'] });
+      queryClient.invalidateQueries({ queryKey: ['progress'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['activity'] });
+      queryClient.invalidateQueries({ queryKey: ['exam-history'] });
     }
   });
 
@@ -427,9 +429,11 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ lang, onAddXp }) => {
               {!quizChecked ? (
                 <button
                   type="submit"
-                  className="ml-auto py-3 px-6 bg-primary text-on-primary hover:bg-primary-hover font-bold rounded-xl text-xs uppercase tracking-wider transition"
+                  disabled={submitMutation.isPending}
+                  className="ml-auto py-3 px-6 bg-primary text-on-primary hover:bg-primary-hover font-bold rounded-xl text-xs uppercase tracking-wider transition disabled:opacity-50 flex items-center gap-2"
                 >
-                  Javoblarni tekshirish
+                  {submitMutation.isPending && <div className="w-3.5 h-3.5 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />}
+                  {submitMutation.isPending ? 'Tekshirilmoqda...' : 'Javoblarni tekshirish'}
                 </button>
               ) : (
                 <button

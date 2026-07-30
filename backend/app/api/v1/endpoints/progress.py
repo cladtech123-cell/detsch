@@ -94,18 +94,6 @@ async def log_study_session(
         lesson_number=payload.lesson_number,
     )
     saved = await repo.log_study_session(session)
-
-    # Update streak: if last study date was yesterday or today, increment/maintain streak
-    progress = await repo.get_progress()
-    today = date.today()
-    if progress.last_study_date is None or progress.last_study_date < today:
-        if progress.last_study_date == today - timedelta(days=1):
-            progress.study_streak += 1
-        elif progress.last_study_date != today:
-            progress.study_streak = 1  # reset streak if gap
-        progress.last_study_date = today
-        await repo.update_progress(progress)
-
     return StudySessionSchema.from_orm(saved)
 
 

@@ -236,6 +236,18 @@ class GermanRepository:
     async def log_study_session(self, session: StudySession) -> StudySession:
         session.user_id = self.user_id
         self.db.add(session)
+        
+        # Update streak: if last study date was yesterday or today, increment/maintain streak
+        progress = await self.get_progress()
+        today = date.today()
+        if progress.last_study_date is None or progress.last_study_date < today:
+            if progress.last_study_date == today - timedelta(days=1):
+                progress.study_streak += 1
+            elif progress.last_study_date != today:
+                progress.study_streak = 1  # reset streak if gap
+            progress.last_study_date = today
+            self.db.add(progress)
+
         await self.db.commit()
         await self.db.refresh(session)
         return session

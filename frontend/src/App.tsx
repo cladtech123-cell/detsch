@@ -133,6 +133,7 @@ function MainApp() {
     localStorage.removeItem('dm_auth_session');
     localStorage.removeItem('dm_auth_token');
     localStorage.removeItem('dm_user_role');
+    queryClient.clear();
     setIsLoggedIn(false);
   };
 
@@ -166,7 +167,7 @@ function MainApp() {
     name: localStorage.getItem('dm_auth_session') || "O'rganuvchi",
     level: progress ? `${progress.target_level} Level` : "B2 O'rta nemis tili",
     avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBIbdrcjAMVx-7TNIA1NylVdL_VjpVWoF8JQhXP7wTG4YXmrA_z5q34E6kYz5gbous0FOa2IFx2NN2rMzkJcbVfJyOpQBe2qVvs3rBIcsa0eppqpv60VsrOZB1MQiNsf5iqx3RoTVN_FL0-G1QnqlQCatdUHOzejcyiPwWGO_ZH4b7v60C7j_V7BPv9F_e3bPbVdeoyirJaI1V1ZxagAEIoLdsfa6qO8vFmW6H5q9B0Yu6a2LxR4wcpgRG3qGxUf9EM-xxvZ7nIJa1C',
-    streakDays: progress?.study_streak || 12,
+    streakDays: progress?.study_streak ?? 12,
     dailyGoalXp: progress ? (progress.weekly_goal_hours > 20 ? Math.round(progress.weekly_goal_hours) : 50) : 50,
     currentXp: progress ? (progress.total_xp || 0) : 35,
     completedLessonsCount: progress?.completed_lessons?.length || 0,
